@@ -3,28 +3,28 @@
 /* ─── CSS Reset & Variables ─── */
 :root {
   --bg-primary: #ffffff;
-  --bg-secondary: #fafafa;
+  --bg-secondary: #fcf7f6;
   --bg-card: #ffffff;
   --bg-card-hover: #f9f9f9;
   --bg-glass: rgba(0, 0, 0, 0.03);
-  --bg-sidebar: #fafafa;
+  --bg-sidebar: #fcf7f6;
   --border-color: #f0f0f0;
-  --border-glow: rgba(228, 67, 50, 0.3);
+  --border-glow: rgba(255, 107, 95, 0.3);
 
-  --text-primary: #202020;
-  --text-secondary: #5a5a5a;
-  --text-muted: #808080;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #6b7280;
 
-  --accent-indigo: #e44332; /* Minimal Red Accent */
-  --accent-violet: #d13928;
+  --accent-indigo: #ff6b5f; /* Coral red */
+  --accent-violet: #ff4f3f;
   --accent-cyan: #06b6d4;
   --accent-emerald: #10b981;
-  --accent-rose: #e44332;
+  --accent-rose: #ef4444;
   --accent-amber: #f59e0b;
   --accent-blue: #3b82f6;
 
-  --gradient-primary: linear-gradient(135deg, #e44332 0%, #d13928 100%);
-  --gradient-card: linear-gradient(145deg, #ffffff, #fafafa);
+  --gradient-primary: linear-gradient(135deg, #ff6b5f 0%, #ff4f3f 100%);
+  --gradient-card: linear-gradient(145deg, #ffffff, #fcf7f6);
 
   --radius-sm: 8px;
   --radius-md: 10px;
@@ -59,11 +59,26 @@ html, body, #root {
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  font-weight: 400;
   background: var(--bg-primary);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Poppins', sans-serif;
+  color: var(--text-primary);
+}
+
+h1 { font-size: 3rem; line-height: 1.08; font-weight: 700; }
+h2 { font-size: 2rem; line-height: 1.125; font-weight: 600; }
+h3 { font-size: 1.5rem; line-height: 1.25; font-weight: 600; }
+h4 { font-size: 1.125rem; line-height: 1.35; font-weight: 600; }
+p { margin-bottom: 1rem; }
+small, .caption { font-size: 0.875rem; line-height: 1.4; color: var(--text-secondary); }
 
 /* ─── App Layout ─── */
 .app-layout {
