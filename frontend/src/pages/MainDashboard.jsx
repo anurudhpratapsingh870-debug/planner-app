@@ -7,6 +7,10 @@ import PlannerView from '../components/PlannerView';
 import ExamPlanner from '../components/ExamPlanner';
 import HabitTracker from '../components/HabitTracker';
 import Calendar from '../components/Calendar';
+import GoalPlanner from '../components/GoalPlanner';
+import Analytics from '../components/Analytics';
+import AIAssistant from '../components/AIAssistant';
+import Settings from '../components/Settings';
 import TaskModal from '../components/TaskModal';
 import RightRail from '../components/RightRail';
 import { fetchTasks, createTask, updateTask, deleteTask, fetchHabits, toggleHabitDay } from '../services/api';
@@ -23,8 +27,8 @@ export default function MainDashboard() {
     async function load() {
       try {
         const [t, h] = await Promise.all([fetchTasks(), fetchHabits()]);
-        setTasks(t);
-        setHabits(h);
+        setTasks(t || []);
+        setHabits(h || []);
       } catch (err) {
         console.error('Failed to load data:', err);
       } finally {
@@ -90,6 +94,10 @@ export default function MainDashboard() {
     office:    '💼 Office Planner',
     habits:    '🔥 Habit Tracker',
     calendar:  '📆 Calendar',
+    goals:     '🎯 Goal Planner',
+    analytics: '📈 Analytics',
+    ai:        '🤖 AI Assistant',
+    settings:  '⚙️ Settings',
   };
 
   // Render active view
@@ -110,6 +118,14 @@ export default function MainDashboard() {
         return <Dashboard tasks={tasks} onNavigate={setActiveView} />;
       case 'timeline':
         return <Timeline tasks={tasks} />;
+      case 'goals':
+        return <GoalPlanner tasks={tasks} />;
+      case 'analytics':
+        return <Analytics />;
+      case 'ai':
+        return <AIAssistant />;
+      case 'settings':
+        return <Settings />;
       case 'exam':
         return (
           <ExamPlanner
@@ -164,7 +180,6 @@ export default function MainDashboard() {
         </div>
       </main>
 
-      {/* Right Rail added per spec */}
       <RightRail />
 
       {showModal && (
