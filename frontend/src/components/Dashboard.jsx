@@ -1,128 +1,106 @@
 import React from 'react';
+import { LayoutDashboard, CheckCircle2, Clock, AlertCircle, CalendarDays, Plus } from 'lucide-react';
 
 const plannerMeta = {
   school: { icon: '🏫', label: 'School',  color: '#4f46e5' },
   ug:     { icon: '🎓', label: 'UG',      color: '#7c3aed' },
-  exam:   { icon: '📝', label: 'Exam',    color: '#dc2626' },
-  daily:  { icon: '📅', label: 'Daily',   color: '#0891b2' },
-  office: { icon: '💼', label: 'Office',  color: '#059669' },
+  exam:   { icon: '📝', label: 'Exam',    color: '#ef4444' }, /* matched to danger */
+  daily:  { icon: '📅', label: 'Daily',   color: '#06b6d4' },
+  office: { icon: '💼', label: 'Office',  color: '#10b981' }, /* matched to success */
 };
 
 export default function Dashboard({ tasks, onNavigate }) {
-  const plannerTypes = ['school', 'ug', 'exam', 'daily', 'office'];
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(t => t.status === 'done').length;
   const urgentTasks = tasks.filter(t => t.priority === 'high' && t.status !== 'done');
-
-  // Upcoming deadlines (next 3 days)
-  const now = new Date();
-  const threeDays = new Date(now.getTime() + 3 * 86400000);
-  const upcoming = tasks
-    .filter(t => t.deadline && new Date(t.deadline) <= threeDays && t.status !== 'done')
-    .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))
-    .slice(0, 5);
+  
+  // Today's tasks
+  const today = tasks.filter(t => t.status !== 'done').slice(0, 4);
 
   return (
-    <div className="page-content">
-      {/* Overview Stats */}
-      <div className="dashboard-grid">
-        <div className="stat-card" style={{ '--card-accent': 'var(--accent-indigo)', '--icon-bg': 'rgba(99,102,241,0.12)' }}>
-          <div className="card-header">
-            <div className="card-icon">📋</div>
-          </div>
-          <div className="card-count">{totalTasks}</div>
-          <div className="card-label">Total Tasks</div>
-          <div className="card-bar">
-            <div className="card-bar-fill" style={{ width: totalTasks > 0 ? `${(completedTasks / totalTasks) * 100}%` : '0%' }}></div>
-          </div>
-        </div>
-
-        <div className="stat-card" style={{ '--card-accent': 'var(--accent-emerald)', '--icon-bg': 'rgba(16,185,129,0.12)' }}>
-          <div className="card-header">
-            <div className="card-icon">✅</div>
-          </div>
-          <div className="card-count">{completedTasks}</div>
-          <div className="card-label">Completed</div>
-          <div className="card-bar">
-            <div className="card-bar-fill" style={{ width: totalTasks > 0 ? `${(completedTasks / totalTasks) * 100}%` : '0%', background: 'var(--accent-emerald)' }}></div>
-          </div>
-        </div>
-
-        <div className="stat-card" style={{ '--card-accent': 'var(--accent-rose)', '--icon-bg': 'rgba(244,63,94,0.12)' }}>
-          <div className="card-header">
-            <div className="card-icon">🔴</div>
-          </div>
-          <div className="card-count">{urgentTasks.length}</div>
-          <div className="card-label">Urgent Tasks</div>
-        </div>
-
-        <div className="stat-card" style={{ '--card-accent': 'var(--accent-amber)', '--icon-bg': 'rgba(245,158,11,0.12)' }}>
-          <div className="card-header">
-            <div className="card-icon">⏰</div>
-          </div>
-          <div className="card-count">{upcoming.length}</div>
-          <div className="card-label">Due in 3 Days</div>
+    <div className="page-content" style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '1000px', margin: '0 auto' }}>
+      
+      {/* Header / Quick Add */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h1 style={{ fontSize: '32px', letterSpacing: '-1px', marginBottom: '8px', color: 'var(--text-primary)' }}>Good morning</h1>
+          <p style={{ fontSize: '16px', color: 'var(--text-secondary)' }}>You have {totalTasks - completedTasks} active tasks across all planners.</p>
         </div>
       </div>
 
-      {/* Planner Cards */}
-      <div className="section-header">
-        <h3>Your Planners</h3>
+      {/* Overview Stats (Progress Widgets) */}
+      <div className="dashboard-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
+        <div style={{ padding: '24px', background: 'var(--bg-primary)', borderRadius: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(255,107,95,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
+              <LayoutDashboard size={20} />
+            </div>
+            <h3 style={{ fontSize: '15px', color: 'var(--text-secondary)' }}>Total Tasks</h3>
+          </div>
+          <div style={{ fontSize: '36px', fontWeight: 700, lineHeight: 1 }}>{totalTasks}</div>
+        </div>
+
+        <div style={{ padding: '24px', background: 'var(--bg-primary)', borderRadius: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(16,185,129,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--success)' }}>
+              <CheckCircle2 size={20} />
+            </div>
+            <h3 style={{ fontSize: '15px', color: 'var(--text-secondary)' }}>Completed</h3>
+          </div>
+          <div style={{ fontSize: '36px', fontWeight: 700, lineHeight: 1 }}>{completedTasks}</div>
+        </div>
+
+        <div style={{ padding: '24px', background: 'var(--bg-primary)', borderRadius: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(239,68,68,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--danger)' }}>
+              <AlertCircle size={20} />
+            </div>
+            <h3 style={{ fontSize: '15px', color: 'var(--text-secondary)' }}>Urgent</h3>
+          </div>
+          <div style={{ fontSize: '36px', fontWeight: 700, lineHeight: 1 }}>{urgentTasks.length}</div>
+        </div>
       </div>
-      <div className="dashboard-grid">
-        {plannerTypes.map(type => {
-          const meta = plannerMeta[type];
-          const plannerTasks = tasks.filter(t => t.planner === type);
-          const done = plannerTasks.filter(t => t.status === 'done').length;
-          return (
-            <div
-              key={type}
-              className="stat-card"
-              style={{ '--card-accent': meta.color, '--icon-bg': `${meta.color}20`, cursor: 'pointer' }}
-              onClick={() => onNavigate(type)}
-            >
-              <div className="card-header">
-                <div className="card-icon" style={{ background: `${meta.color}20` }}>{meta.icon}</div>
-                <span className="status-badge" style={{ background: `${meta.color}15`, color: meta.color }}>
-                  {plannerTasks.length} tasks
-                </span>
-              </div>
-              <div className="card-count" style={{ fontSize: '24px' }}>{meta.label}</div>
-              <div className="card-label">{done}/{plannerTasks.length} completed</div>
-              <div className="card-bar">
-                <div className="card-bar-fill" style={{ width: plannerTasks.length > 0 ? `${(done / plannerTasks.length) * 100}%` : '0%', background: meta.color }}></div>
+
+      {/* Today Card (Task List) */}
+      <div style={{ background: 'var(--bg-primary)', borderRadius: '16px', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
+        <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--surface)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <CalendarDays size={18} color="var(--primary)" />
+            <span style={{ fontSize: '16px', fontWeight: 600 }}>Today's Tasks</span>
+          </div>
+          <button style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: 'var(--primary)', fontWeight: 600, fontSize: '14px', cursor: 'pointer' }}>
+            View all
+          </button>
+        </div>
+        
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {today.length > 0 ? today.map(task => (
+            <div key={task.id} style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px 24px', borderBottom: '1px solid var(--border-color)', cursor: 'pointer', transition: 'background 0.2s' }} className="task-row">
+              <div style={{ width: '20px', height: '20px', borderRadius: '6px', border: '2px solid var(--text-muted)', cursor: 'pointer', flexShrink: 0 }}></div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)', marginBottom: '4px' }}>{task.title}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '13px' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-secondary)' }}><Clock size={14} /> {task.deadline ? new Date(task.deadline).toLocaleDateString() : 'No date'}</span>
+                  <span style={{ background: `${plannerMeta[task.planner]?.color}15`, color: plannerMeta[task.planner]?.color, padding: '2px 8px', borderRadius: '12px', fontWeight: 600 }}>{plannerMeta[task.planner]?.label}</span>
+                </div>
               </div>
             </div>
-          );
-        })}
-      </div>
-
-      {/* Upcoming Deadlines */}
-      {upcoming.length > 0 && (
-        <div style={{ marginTop: '28px' }}>
-          <div className="section-header">
-            <h3>⚡ Upcoming Deadlines</h3>
-          </div>
-          <div className="task-list">
-            {upcoming.map(task => (
-              <div key={task.id} className="task-item">
-                <div className="task-checkbox"></div>
-                <div className="task-info">
-                  <div className="task-title">{task.title}</div>
-                  <div className="task-desc">{task.description}</div>
-                </div>
-                <div className="task-meta">
-                  <span className={`priority-badge priority-${task.priority}`}>{task.priority}</span>
-                  <span className="task-deadline">📅 {task.deadline}</span>
-                  <span className={`tl-planner`} style={{ background: `${plannerMeta[task.planner]?.color}20`, color: plannerMeta[task.planner]?.color, fontSize: '11px', fontWeight: 600, padding: '3px 10px', borderRadius: '9999px' }}>
-                    {plannerMeta[task.planner]?.icon} {task.planner}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
+          )) : (
+            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
+              <div style={{ fontSize: '40px', marginBottom: '16px' }}>🎉</div>
+              <h3 style={{ fontSize: '16px', fontWeight: 500 }}>All caught up!</h3>
+              <p style={{ fontSize: '14px', marginTop: '4px' }}>No active tasks for today.</p>
+            </div>
+          )}
         </div>
-      )}
+        <div style={{ padding: '16px 24px', background: 'var(--surface)' }}>
+          <button style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '10px', background: 'transparent', border: '1px dashed var(--border-color)', borderRadius: '8px', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+            <Plus size={16} />
+            <span>Add Task</span>
+          </button>
+        </div>
+      </div>
+      
     </div>
   );
 }
