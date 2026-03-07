@@ -19,8 +19,7 @@ export async function sendToGemini(userMessage, conversationHistory = []) {
   // Try multiple model endpoints for robustness
   const models = [
     'gemini-1.5-flash',
-    'gemini-2.0-flash',
-    'gemini-pro'
+    'gemini-1.5-pro'
   ];
 
   let lastError = null;
@@ -29,14 +28,10 @@ export async function sendToGemini(userMessage, conversationHistory = []) {
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
 
-      // Build conversation - system prompt as first user message
+      // Build contents array
       const contents = [];
       
-      // System instruction as first turn
-      contents.push({ role: 'user', parts: [{ text: SYSTEM_PROMPT }] });
-      contents.push({ role: 'model', parts: [{ text: 'Understood. I am Antigravity AI, your Life Planner assistant. I will generate structured task plans when asked, and provide helpful advice otherwise.' }] });
-
-      // Add previous conversation (last 6 messages for context window safety)
+      // Add previous conversation
       const recentHistory = conversationHistory.slice(-6);
       for (const msg of recentHistory) {
         contents.push({
@@ -52,10 +47,15 @@ export async function sendToGemini(userMessage, conversationHistory = []) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          system_instruction: {
+            parts: [{ text: SYSTEM_PROMPT }]
+          },
           contents,
           generationConfig: {
             temperature: 0.7,
-            maxOutputTokens: 4096
+            maxOutputTokens: 2048,
+            topP: 0.95,
+            topK: 64
           }
         })
       });
@@ -64,14 +64,13 @@ export async function sendToGemini(userMessage, conversationHistory = []) {
         const errData = await response.json().catch(() => ({}));
         lastError = errData.error?.message || `API error ${response.status}`;
         console.warn(`Model ${model} failed: ${lastError}`);
-        continue; // Try next model
+        continue;
       }
 
       const data = await response.json();
       
-      // Check for safety blocks or empty responses
       if (data.candidates?.[0]?.finishReason === 'SAFETY') {
-        return 'I cannot generate content for that request. Please try rephrasing your goal.';
+        return 'I cannot generate content for that request due to safety restrictions. Please try rephrasing your goal.';
       }
 
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
