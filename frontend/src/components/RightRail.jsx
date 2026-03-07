@@ -13,7 +13,7 @@ const plannerColors = {
   office: '#10b981',
 };
 
-export default function RightRail({ tasks = [] }) {
+export default function RightRail({ tasks = [], onEditTask }) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
 
@@ -126,7 +126,10 @@ export default function RightRail({ tasks = [] }) {
               <div key={task.id} style={{ display: 'flex', gap: '16px', position: 'relative', zIndex: 1, alignItems: 'flex-start' }}>
                 <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', width: '40px', marginTop: '12px' }}>{timeStr}</div>
                 
-                <div style={{ flex: 1, background: '#fff', borderRadius: '12px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)', padding: '16px', position: 'relative' }}>
+                <div 
+                  style={{ flex: 1, background: '#fff', borderRadius: '12px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)', padding: '16px', position: 'relative', cursor: 'pointer' }}
+                  onClick={() => onEditTask && onEditTask(task)}
+                >
                   {/* Timeline Node */}
                   <div style={{ position: 'absolute', left: '-18px', top: '16px', width: '10px', height: '10px', borderRadius: '50%', background: dotColor, border: '2px solid #fff', boxShadow: '0 0 0 1px var(--border-color)' }}></div>
                   
@@ -135,7 +138,7 @@ export default function RightRail({ tasks = [] }) {
                     <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>{task.title}</div>
                     <button style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}><MoreHorizontal size={16}/></button>
                   </div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{task.title}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{task.planner} - {task.status}</div>
                 </div>
               </div>
             );

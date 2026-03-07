@@ -22,6 +22,7 @@ export default function MainDashboard() {
   const [tasks, setTasks] = useState([]);
   const [habits, setHabits] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [editingTask, setEditingTask] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Derive active view from URL
@@ -55,11 +56,26 @@ export default function MainDashboard() {
   // CRUD handlers
   const handleAddTask = async (taskData) => {
     try {
-      const newTask = await createTask(taskData);
-      setTasks(prev => [...prev, newTask]);
+      if (editingTask) {
+        const updated = await updateTask(editingTask.id, taskData);
+        setTasks(prev => prev.map(t => t.id === editingTask.id ? updated : t));
+      } else {
+        const newTask = await createTask(taskData);
+        setTasks(prev => [...prev, newTask]);
+      }
     } catch (err) {
-      console.error('Failed to create task:', err);
+      console.error('Failed to save task:', err);
     }
+  };
+
+  const handleOpenEdit = (task) => {
+    setEditingTask(task);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setEditingTask(null);
+    setShowModal(false);
   };
 
   const handleToggleTask = async (id, newStatus) => {
@@ -124,11 +140,11 @@ export default function MainDashboard() {
 
     return (
       <Routes>
-        <Route path="/" element={<Dashboard tasks={tasks} onNavigate={handleNavigate} />} />
-        <Route path="dashboard" element={<Dashboard tasks={tasks} onNavigate={handleNavigate} />} />
-        <Route path="timeline" element={<Timeline tasks={tasks} />} />
+        <Route path="/" element={<Dashboard tasks={tasks} onNavigate={handleNavigate} onEditTask={handleOpenEdit} />} />
+        <Route path="dashboard" element={<Dashboard tasks={tasks} onNavigate={handleNavigate} onEditTask={handleOpenEdit} />} />
+        <Route path="timeline" element={<Timeline tasks={tasks} onEditTask={handleOpenEdit} />} />
         <Route path="goals" element={<GoalPlanner tasks={tasks} />} />
-        <Route path="analytics" element={<Analytics />} />
+        <Route path="analytics" element={<Analytics tasks={tasks} />} />
         <Route path="ai" element={<AIAssistant />} />
         <Route path="settings" element={<Settings />} />
         <Route path="exam" element={
@@ -152,6 +168,7 @@ export default function MainDashboard() {
                 onToggleTask={handleToggleTask}
                 onDeleteTask={handleDeleteTask}
                 onAddTask={() => setShowModal(true)}
+                onEditTask={handleOpenEdit}
               />
             } 
           />
@@ -189,13 +206,15 @@ export default function MainDashboard() {
         </div>
       </main>
 
-      <RightRail tasks={tasks} />
+      <RightRail tasks={tasks} onEditTask={handleOpenEdit} />
 
       {showModal && (
         <TaskModal
-          onClose={() => setShowModal(false)}
+          onClose={handleCloseModal}
           onSave={handleAddTask}
+          onDelete={handleDeleteTask}
           initialPlanner={['school', 'ug', 'exam', 'daily', 'office'].includes(activeView) ? activeView : 'daily'}
+          editingTask={editingTask}
         />
       )}
     </div>

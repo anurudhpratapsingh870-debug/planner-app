@@ -11,7 +11,7 @@ const plannerMeta = {
   office: { label: 'Office/Work', color: 'var(--accent-green)', bg: 'var(--bg-green-light)' },
 };
 
-export default function Dashboard({ tasks, onNavigate }) {
+export default function Dashboard({ tasks, onNavigate, onEditTask }) {
   // --- Derived Statistics ---
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(t => t.status === 'done').length;
@@ -111,7 +111,12 @@ export default function Dashboard({ tasks, onNavigate }) {
             const meta = plannerMeta[task.planner] || plannerMeta.daily;
 
             return (
-              <div key={task.id} style={{ height: '36px', background: meta.bg, borderRadius: '18px', width: `${widthPercent}%`, marginLeft: `${leftPercent}%`, display: 'flex', alignItems: 'center', padding: '0 12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', position: 'relative', zIndex: 1 }}>
+              <div 
+                key={task.id} 
+                className="hover-lift"
+                onClick={() => onEditTask && onEditTask(task)}
+                style={{ height: '36px', background: meta.bg, borderRadius: '18px', width: `${widthPercent}%`, marginLeft: `${leftPercent}%`, display: 'flex', alignItems: 'center', padding: '0 12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', position: 'relative', zIndex: 1, cursor: 'pointer', transition: 'transform 0.2s' }}
+              >
                 <div style={{ background: meta.color, width: '8px', height: '8px', borderRadius: '50%', marginRight: '8px' }}></div>
                 <span style={{ fontSize: '13px', fontWeight: 600, color: meta.color, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{task.title}</span>
               </div>

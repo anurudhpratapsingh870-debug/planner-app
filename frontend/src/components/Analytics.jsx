@@ -1,7 +1,42 @@
 import React from 'react';
 import { BarChart3, TrendingUp, PieChart, Activity, Calendar } from 'lucide-react';
 
-export default function Analytics() {
+export default function Analytics({ tasks = [] }) {
+  // Calculated stats
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter(t => t.status === 'done').length;
+  const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+  
+  // Weekly Tasks (Tasks due this week or created recently, simple count for now)
+  const activeTasks = tasks.filter(t => t.status !== 'done').length;
+
+  // Breakdown by planner
+  const plannerBreakdown = {};
+  tasks.forEach(t => {
+    plannerBreakdown[t.planner] = (plannerBreakdown[t.planner] || 0) + 1;
+  });
+
+  const getPlannerColor = (p) => {
+    switch(p) {
+      case 'school': return 'var(--accent-indigo)';
+      case 'office': return 'var(--success)';
+      case 'daily': return 'var(--accent-amber)';
+      case 'exam': return 'var(--accent-red)';
+      case 'ug': return 'var(--accent-purple)';
+      default: return 'var(--text-muted)';
+    }
+  };
+
+  const getPlannerLabel = (p) => {
+    const labels = { school: 'Studies', office: 'Work', daily: 'Daily', exam: 'Exams', ug: 'Undergrad' };
+    return labels[p] || 'Other';
+  };
+
+  const breakdownStats = Object.keys(plannerBreakdown).map(k => ({
+    label: getPlannerLabel(k),
+    color: getPlannerColor(k),
+    p: Math.round((plannerBreakdown[k] / totalTasks) * 100)
+  })).sort((a,b) => b.p - a.p);
   return (
     <div className="page-content" style={{ maxWidth: '1000px', margin: '0 auto' }}>
       
@@ -14,10 +49,10 @@ export default function Analytics() {
       {/* Hero Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', marginBottom: '32px' }}>
         {[
-          { label: 'Completion Rate', value: '84%', icon: <Activity size={20} />, color: 'var(--success)' },
-          { label: 'Weekly Study', value: '18.5h', icon: <Calendar size={20} />, color: 'var(--accent-indigo)' },
-          { label: 'Habit Strength', value: 'High', icon: <TrendingUp size={20} />, color: 'var(--accent-amber)' },
-          { label: 'Goals On Track', value: '5/6', icon: <PieChart size={20} />, color: 'var(--accent-blue)' },
+          { label: 'Completion Rate', value: `${completionRate}%`, icon: <Activity size={20} />, color: 'var(--success)' },
+          { label: 'Total Tasks', value: totalTasks.toString(), icon: <Calendar size={20} />, color: 'var(--accent-indigo)' },
+          { label: 'Active Tasks', value: activeTasks.toString(), icon: <TrendingUp size={20} />, color: 'var(--accent-amber)' },
+          { label: 'Goals On Track', value: 'Local Env', icon: <PieChart size={20} />, color: 'var(--accent-blue)' },
         ].map((stat, i) => (
           <div key={i} style={{ padding: '24px', background: 'var(--bg-primary)', borderRadius: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
              <div style={{ color: stat.color, marginBottom: '12px' }}>{stat.icon}</div>
@@ -63,22 +98,19 @@ export default function Analytics() {
           <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '24px' }}>Time Distribution</h3>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            {[
-              { label: 'Studies', color: 'var(--accent-indigo)', p: 45 },
-              { label: 'Work', color: 'var(--success)', p: 30 },
-              { label: 'Health', color: 'var(--accent-amber)', p: 15 },
-              { label: 'Other', color: 'var(--text-muted)', p: 10 },
-            ].map((item, i) => (
+            {breakdownStats.length > 0 ? breakdownStats.map((item, i) => (
               <div key={i}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '14px' }}>
                   <span style={{ fontWeight: 600 }}>{item.label}</span>
                   <span style={{ color: 'var(--text-muted)' }}>{item.p}%</span>
                 </div>
                 <div style={{ height: '8px', width: '100%', background: 'var(--bg-secondary)', borderRadius: '4px', overflow: 'hidden' }}>
-                  <div style={{ width: `${item.p}%`, height: '100%', background: item.color }}></div>
+                  <div style={{ width: `${item.p}%`, height: '100%', background: item.color, transition: 'width 0.5s ease-out' }}></div>
                 </div>
               </div>
-            ))}
+            )) : (
+              <div style={{ color: 'var(--text-muted)', fontSize: '14px', textAlign: 'center', paddingTop: '10px' }}>No tasks assigned to categories yet.</div>
+            )}
           </div>
 
           <div style={{ marginTop: '32px', textAlign: 'center' }}>

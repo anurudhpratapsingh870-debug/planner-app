@@ -19,7 +19,7 @@ const MilestoneIcon = ({ type }) => {
   }
 };
 
-export default function Timeline({ tasks }) {
+export default function Timeline({ tasks, onEditTask }) {
   const sortedTasks = [...tasks].sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
 
   return (
@@ -68,7 +68,7 @@ export default function Timeline({ tasks }) {
                     borderRadius: '12px', padding: '16px 20px', 
                     boxShadow: 'var(--shadow-sm)', transition: 'transform 0.2s',
                     cursor: 'pointer'
-                  }} className="hover-lift">
+                  }} className="hover-lift" onClick={() => onEditTask && onEditTask(task)}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <div style={{ color: color }}><MilestoneIcon type={task.planner} /></div>

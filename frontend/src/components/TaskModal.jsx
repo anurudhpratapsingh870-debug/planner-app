@@ -1,8 +1,15 @@
 import React, { useState } from 'react';
 import { X, Calendar as CalIcon, Flag, Briefcase, GraduationCap, ClipboardList, Target, Flame } from 'lucide-react';
 
-export default function TaskModal({ onClose, onSave, initialPlanner }) {
-  const [form, setForm] = useState({
+export default function TaskModal({ onClose, onSave, onDelete, initialPlanner, editingTask }) {
+  const [form, setForm] = useState(editingTask ? {
+    title: editingTask.title || '',
+    description: editingTask.description || '',
+    deadline: editingTask.deadline ? editingTask.deadline.split('T')[0] : '', // format for date input
+    priority: editingTask.priority || 'medium',
+    status: editingTask.status || 'pending',
+    planner: editingTask.planner || initialPlanner || 'daily'
+  } : {
     title: '',
     description: '',
     deadline: '',
@@ -31,7 +38,7 @@ export default function TaskModal({ onClose, onSave, initialPlanner }) {
       <div className="modal" onClick={e => e.stopPropagation()} style={{ width: '560px', background: 'var(--bg-primary)', borderRadius: '20px', padding: '32px', boxShadow: 'var(--shadow-xl)', border: '1px solid var(--border-color)', animation: 'slideUp 0.3s ease-out' }}>
         
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <h3 style={{ fontSize: '24px', fontWeight: 700, margin: 0, letterSpacing: '-0.5px' }}>Create New Task</h3>
+          <h3 style={{ fontSize: '24px', fontWeight: 700, margin: 0, letterSpacing: '-0.5px' }}>{editingTask ? 'Edit Task' : 'Create New Task'}</h3>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><X size={24} /></button>
         </div>
 
@@ -122,9 +129,15 @@ export default function TaskModal({ onClose, onSave, initialPlanner }) {
 
           </div>
 
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-            <button type="button" onClick={onClose} style={{ padding: '10px 24px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'transparent', fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer' }}>Cancel</button>
-            <button type="submit" style={{ padding: '10px 32px', borderRadius: '8px', border: 'none', background: 'var(--primary)', fontWeight: 700, color: '#fff', cursor: 'pointer', boxShadow: 'var(--shadow-md)' }}>Save Task</button>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'space-between' }}>
+            {editingTask ? (
+              <button type="button" onClick={() => { onDelete(editingTask.id); onClose(); }} style={{ padding: '10px 24px', borderRadius: '8px', border: 'none', background: '#fee2e2', fontWeight: 600, color: '#dc2626', cursor: 'pointer' }}>Delete</button>
+            ) : <div></div>}
+            
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button type="button" onClick={onClose} style={{ padding: '10px 24px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'transparent', fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer' }}>Cancel</button>
+              <button type="submit" style={{ padding: '10px 32px', borderRadius: '8px', border: 'none', background: 'var(--primary)', fontWeight: 700, color: '#fff', cursor: 'pointer', boxShadow: 'var(--shadow-md)' }}>{editingTask ? 'Save Changes' : 'Save Task'}</button>
+            </div>
           </div>
         </form>
       </div>
