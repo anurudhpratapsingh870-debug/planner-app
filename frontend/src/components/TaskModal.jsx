@@ -31,7 +31,7 @@ export default function TaskModal({ onClose, onSave, initialPlanner }) {
       <div className="modal" onClick={e => e.stopPropagation()} style={{ width: '560px', background: 'var(--bg-primary)', borderRadius: '20px', padding: '32px', boxShadow: 'var(--shadow-xl)', border: '1px solid var(--border-color)', animation: 'slideUp 0.3s ease-out' }}>
         
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <h3 style={{ fontSize: '24px', fontWeight: 700, margin: 0, letterSpacing: '-0.5px' }}>✨ Create New Task</h3>
+          <h3 style={{ fontSize: '24px', fontWeight: 700, margin: 0, letterSpacing: '-0.5px' }}>Create New Task</h3>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><X size={24} /></button>
         </div>
 

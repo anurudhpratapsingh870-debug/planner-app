@@ -91,19 +91,19 @@ export default function MainDashboard() {
 
   // View titles
   const viewTitles = {
-    dashboard: '📊 Dashboard',
-    timeline:  '🕐 Timeline',
-    school:    '🏫 School Planner',
-    ug:        '🎓 UG Planner',
-    exam:      '📝 Exam Planner',
-    daily:     '📅 Daily Planner',
-    office:    '💼 Office Planner',
-    habits:    '🔥 Habit Tracker',
-    calendar:  '📆 Calendar',
-    goals:     '🎯 Goal Planner',
-    analytics: '📈 Analytics',
-    ai:        '🤖 AI Assistant',
-    settings:  '⚙️ Settings',
+    dashboard: 'Dashboard',
+    timeline:  'Timeline',
+    school:    'School Planner',
+    ug:        'UG Planner',
+    exam:      'Exam Planner',
+    daily:     'Daily Planner',
+    office:    'Office Planner',
+    habits:    'Habit Tracker',
+    calendar:  'Calendar',
+    goals:     'Goal Planner',
+    analytics: 'Analytics',
+    ai:        'AI Assistant',
+    settings:  'Settings',
   };
 
   const handleNavigate = (view) => {
@@ -174,8 +174,12 @@ export default function MainDashboard() {
         <header className="main-header" style={{ height: '72px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 32px', background: 'var(--bg-primary)' }}>
           <h2 style={{ fontSize: '18px', fontWeight: 600 }}>{viewTitles[activeView] || 'Dashboard'}</h2>
           <div className="header-actions">
-            <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-              ✨ New Task
+            <button 
+              className="btn btn-primary" 
+              onClick={() => setShowModal(true)}
+              style={{ padding: '10px 20px', fontSize: '14px' }}
+            >
+              New Task
             </button>
           </div>
         </header>

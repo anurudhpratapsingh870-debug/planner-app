@@ -41,15 +41,13 @@ export async function deleteTask(id) {
   return { success: true };
 }
 
-export async function fetchPlanners() {
-  return [
-    { id: 'school', name: 'School', icon: '🏫' },
-    { id: 'ug', name: 'Undergrad', icon: '🎓' },
-    { id: 'exam', name: 'Exam Prep', icon: '📝' },
-    { id: 'daily', name: 'Daily', icon: '📅' },
-    { id: 'office', name: 'Office', icon: '💼' }
-  ];
-}
+export const PLANNERS = [
+  { id: 'school', name: 'School' },
+  { id: 'ug', name: 'Undergrad' },
+  { id: 'exam', name: 'Exam Prep' },
+  { id: 'daily', name: 'Daily' },
+  { id: 'office', name: 'Office' }
+];
 
 export async function fetchHabits() {
   const { data, error } = await supabase.from('habits').select('*').order('created_at', { ascending: true });

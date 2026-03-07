@@ -3,10 +3,10 @@ import { Plus, Clock, Flag, Circle, CheckCircle2, MoreHorizontal, Calendar as Ca
 import { format } from 'date-fns';
 
 const plannerMeta = {
-  school: { icon: '🏫', label: 'School Planner',  color: '#4f46e5', desc: 'Assignments & Classes', theme: 'indigo' },
-  ug:     { icon: '🎓', label: 'UG Planner',      color: '#7c3aed', desc: 'Semester & Research', theme: 'violet' },
-  daily:  { icon: '📅', label: 'Daily Planner',   color: '#06b6d4', desc: 'Agendas & Time Blocks', theme: 'cyan' },
-  office: { icon: '💼', label: 'Office Planner',  color: '#10b981', desc: 'Meetings & Objectives', theme: 'emerald' },
+  school: { label: 'School Planner',  color: '#4f46e5', desc: 'Assignments & Classes', theme: 'indigo' },
+  ug:     { label: 'UG Planner',      color: '#7c3aed', desc: 'Semester & Research', theme: 'violet' },
+  daily:  { label: 'Daily Planner',   color: '#06b6d4', desc: 'Agendas & Time Blocks', theme: 'cyan' },
+  office: { label: 'Office Planner',  color: '#10b981', desc: 'Meetings & Objectives', theme: 'emerald' },
 };
 
 export default function PlannerView({ type, tasks, onToggleTask, onDeleteTask, onAddTask }) {

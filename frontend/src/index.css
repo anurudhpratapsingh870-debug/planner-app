@@ -2,47 +2,78 @@
 
 /* ─── CSS Reset & Variables ─── */
 :root {
-  --bg-primary: #ffffff;
-  --bg-secondary: #fcf7f6;
-  --bg-card: #ffffff;
-  --bg-card-hover: #f9f9f9;
+  /* Reference Layout Colors */
+  --bg-primary: #f2f5fa; /* Soft light blue/gray background typical in SaaS */
+  --bg-secondary: #ffffff; /* Sidebars and Modals */
+  --bg-card: #ffffff; /* All cards are white */
+  --bg-card-hover: #fafafa;
   --bg-glass: rgba(0, 0, 0, 0.03);
-  --bg-sidebar: #fcf7f6;
-  --border-color: #f0f0f0;
-  --border-glow: rgba(255, 107, 95, 0.3);
+  --bg-sidebar: #ffffff;
+  --border-color: #f1f5f9;
+  --border-glow: rgba(79, 70, 229, 0.1);
 
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #6b7280;
+  /* Typography */
+  --text-primary: #1e293b; /* Slate 800 */
+  --text-secondary: #64748b; /* Slate 500 */
+  --text-muted: #94a3b8; /* Slate 400 */
 
-  --accent-indigo: #ff6b5f; /* Coral red */
-  --accent-violet: #ff4f3f;
-  --accent-cyan: #06b6d4;
-  --accent-emerald: #10b981;
-  --accent-rose: #ef4444;
-  --accent-amber: #f59e0b;
+  /* Reference Precise Pastels */
+  --accent-indigo: #4f46e5;
+  --accent-purple: #8b5cf6;
+  --accent-pink: #f472b6;
+  --accent-orange: #f97316;
+  --accent-green: #10b981;
   --accent-blue: #3b82f6;
+  --accent-red: #ef4444;
 
-  --gradient-primary: linear-gradient(135deg, #ff6b5f 0%, #ff4f3f 100%);
-  --gradient-card: linear-gradient(145deg, #ffffff, #fcf7f6);
+  /* Pastel Backgrounds */
+  --bg-purple-light: #f3e8ff;
+  --bg-pink-light: #fce7f3;
+  --bg-orange-light: #ffedd5;
+  --bg-green-light: #dcfce7;
+  --bg-blue-light: #dbeafe;
+  --bg-red-light: #fee2e2;
+
+  --gradient-primary: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+  --gradient-card: #ffffff; /* Solid white instead of gradient */
 
   --radius-sm: 8px;
-  --radius-md: 10px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
   --radius-full: 9999px;
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.08);
-  --shadow-glow: 0 4px 14px rgba(228, 67, 50, 0.2);
+  /* Very soft shadows matching reference */
+  --shadow-sm: 0 2px 8px rgba(30, 41, 59, 0.04);
+  --shadow-md: 0 4px 16px rgba(30, 41, 59, 0.06);
+  --shadow-lg: 0 10px 40px rgba(30, 41, 59, 0.08);
+  --shadow-glow: 0 4px 14px rgba(79, 70, 229, 0.2);
 
   --transition-fast: 0.15s ease;
   --transition-normal: 0.25s ease;
   --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
-  --sidebar-width: 260px;
-  --header-height: 64px;
+  --sidebar-width: 250px;
+  --header-height: 72px;
+}
+
+[data-theme='dark'] {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-card: #1e293b;
+  --bg-card-hover: #2dd4bf0a; /* Subtle hover */
+  --bg-glass: rgba(255, 255, 255, 0.05);
+  --bg-sidebar: #1e293b;
+  --border-color: #334155;
+  
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.6);
+  --gradient-card: #1e293b;
 }
 
 [data-theme='dark'] {
@@ -237,17 +268,12 @@ small, .caption { font-size: 0.875rem; line-height: 1.4; color: var(--text-secon
 }
 
 .main-header {
-  position: sticky;
-  top: 0;
-  z-index: 50;
   height: var(--header-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 32px;
-  background: rgba(15, 15, 26, 0.85);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-primary); /* Remove glass/blur effect from header */
 }
 
 .main-header h2 {

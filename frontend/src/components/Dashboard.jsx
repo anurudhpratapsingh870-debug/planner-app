@@ -4,11 +4,11 @@ import { Clock, CheckCircle2, AlertCircle, LayoutDashboard, Calendar as Calendar
 import { format, startOfDay, endOfDay, differenceInHours, addHours } from 'date-fns';
 
 const plannerMeta = {
-  school: { label: 'School Project', color: '#4f46e5', bg: '#e0e7ff' },
-  ug:     { label: 'UG Research', color: '#7c3aed', bg: '#ede9fe' },
-  exam:   { label: 'Exam Prep', color: '#ef4444', bg: '#fee2e2' },
-  daily:  { label: 'Daily Tasks', color: '#06b6d4', bg: '#cffafe' },
-  office: { label: 'Office/Work', color: '#10b981', bg: '#d1fae5' },
+  school: { label: 'School Project', color: 'var(--accent-indigo)', bg: 'var(--bg-blue-light)' },
+  ug:     { label: 'UG Research', color: 'var(--accent-purple)', bg: 'var(--bg-purple-light)' },
+  exam:   { label: 'Exam Prep', color: 'var(--accent-red)', bg: 'var(--bg-red-light)' },
+  daily:  { label: 'Daily Tasks', color: 'var(--accent-orange)', bg: 'var(--bg-orange-light)' },
+  office: { label: 'Office/Work', color: 'var(--accent-green)', bg: 'var(--bg-green-light)' },
 };
 
 export default function Dashboard({ tasks, onNavigate }) {
@@ -53,18 +53,18 @@ export default function Dashboard({ tasks, onNavigate }) {
           <p style={{ fontSize: '15px', color: 'var(--text-secondary)' }}>Welcome back. Here is your system status.</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-          {/* Mock Cartoon Avatars matching the specific UI request */}
+          {/* Professional Status / Teams (Initials instead of playful cartoons) */}
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            {['Felix', 'Aneka', 'Oliver', 'Zoe'].map((seed, i) => (
-               <img 
-                 key={seed} 
-                 src={`https://api.dicebear.com/7.x/notionists/svg?seed=${seed}&backgroundColor=eef2ff`} 
-                 alt={seed} 
-                 style={{ width: '36px', height: '36px', borderRadius: '50%', border: '2px solid var(--bg-primary)', marginLeft: i > 0 ? '-12px' : '0', background: 'var(--bg-secondary)', zIndex: 10 - i }}
-                 title={`Team Member: ${seed}`}
-               />
+            {['SJ', 'MD', 'AR', 'KL'].map((initials, i) => (
+               <div 
+                 key={initials} 
+                 style={{ width: '36px', height: '36px', borderRadius: '50%', border: '2px solid var(--bg-primary)', marginLeft: i > 0 ? '-12px' : '0', background: 'var(--bg-secondary)', zIndex: 10 - i, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', boxShadow: 'var(--shadow-sm)' }}
+                 title={`Team Member: ${initials}`}
+               >
+                 {initials}
+               </div>
             ))}
-            <div style={{ width: '36px', height: '36px', borderRadius: '50%', border: '2px solid var(--bg-primary)', marginLeft: '-12px', background: 'var(--bg-sidebar)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', zIndex: 0 }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: '50%', border: '2px solid var(--bg-primary)', marginLeft: '-12px', background: 'var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', zIndex: 0, boxShadow: 'var(--shadow-sm)' }}>
               +3
             </div>
           </div>
@@ -122,39 +122,50 @@ export default function Dashboard({ tasks, onNavigate }) {
         </div>
       </div>
 
-      {/* --- Row 2: Task Completion Summary Cards --- */}
-      <h3 style={{ fontSize: '18px', fontWeight: 700, marginTop: '8px' }}>Task Summary</h3>
+      {/* --- Row 2: Task Completion Summary Cards (Matching Reference Exact Layout) --- */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px', marginBottom: '-16px' }}>
+        <h3 style={{ fontSize: '18px', fontWeight: 700 }}>Task Completion</h3>
+        <span style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 500 }}>Overall Status</span>
+      </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
-        <div style={{ background: '#eff6ff', borderRadius: '16px', padding: '24px' }}>
-          <div style={{ width: '40px', height: '40px', background: '#3b82f6', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
-            <LayoutDashboard size={20} />
+        <div style={{ background: 'var(--bg-card)', borderRadius: '16px', padding: '20px', display: 'flex', alignItems: 'center', gap: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
+          <div style={{ width: '44px', height: '44px', background: 'var(--bg-blue-light)', color: 'var(--accent-indigo)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <LayoutDashboard size={20} strokeWidth={2.5} />
           </div>
-          <div style={{ fontSize: '24px', fontWeight: 700, color: '#1e3a8a' }}>{incompleteTasks} Tasks</div>
-          <div style={{ fontSize: '13px', color: '#60a5fa', fontWeight: 500, marginTop: '4px' }}>Incomplete</div>
+          <div>
+            <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)' }}>{incompleteTasks} Tasks</div>
+            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 500 }}>Incomplete</div>
+          </div>
         </div>
 
-        <div style={{ background: '#fff7ed', borderRadius: '16px', padding: '24px' }}>
-          <div style={{ width: '40px', height: '40px', background: '#f97316', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
-            <Clock size={20} />
+        <div style={{ background: 'var(--bg-card)', borderRadius: '16px', padding: '20px', display: 'flex', alignItems: 'center', gap: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
+          <div style={{ width: '44px', height: '44px', background: 'var(--bg-orange-light)', color: 'var(--accent-orange)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Clock size={20} strokeWidth={2.5} />
           </div>
-          <div style={{ fontSize: '24px', fontWeight: 700, color: '#9a3412' }}>{inProgressTasks} Tasks</div>
-          <div style={{ fontSize: '13px', color: '#fb923c', fontWeight: 500, marginTop: '4px' }}>In Progress</div>
+          <div>
+            <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)' }}>{inProgressTasks} Tasks</div>
+            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 500 }}>In Progress</div>
+          </div>
         </div>
 
-        <div style={{ background: '#f0fdf4', borderRadius: '16px', padding: '24px' }}>
-          <div style={{ width: '40px', height: '40px', background: '#22c55e', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
-            <CheckCircle2 size={20} />
+        <div style={{ background: 'var(--bg-card)', borderRadius: '16px', padding: '20px', display: 'flex', alignItems: 'center', gap: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
+          <div style={{ width: '44px', height: '44px', background: 'var(--bg-green-light)', color: 'var(--accent-green)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <CheckCircle2 size={20} strokeWidth={2.5} />
           </div>
-          <div style={{ fontSize: '24px', fontWeight: 700, color: '#14532d' }}>{completedTasks} Tasks</div>
-          <div style={{ fontSize: '13px', color: '#4ade80', fontWeight: 500, marginTop: '4px' }}>Completed</div>
+          <div>
+            <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)' }}>{completedTasks} Tasks</div>
+            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 500 }}>Completed</div>
+          </div>
         </div>
 
-        <div style={{ background: '#fef2f2', borderRadius: '16px', padding: '24px' }}>
-          <div style={{ width: '40px', height: '40px', background: '#ef4444', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
-            <AlertCircle size={20} />
+        <div style={{ background: 'var(--bg-card)', borderRadius: '16px', padding: '20px', display: 'flex', alignItems: 'center', gap: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
+          <div style={{ width: '44px', height: '44px', background: 'var(--bg-red-light)', color: 'var(--accent-red)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <AlertCircle size={20} strokeWidth={2.5} />
           </div>
-          <div style={{ fontSize: '24px', fontWeight: 700, color: '#7f1d1d' }}>{urgentTasks} Tasks</div>
-          <div style={{ fontSize: '13px', color: '#f87171', fontWeight: 500, marginTop: '4px' }}>Urgent/Obstacles</div>
+          <div>
+            <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)' }}>{urgentTasks} Tasks</div>
+            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 500 }}>Urgent Items</div>
+          </div>
         </div>
       </div>
 
@@ -211,10 +222,10 @@ export default function Dashboard({ tasks, onNavigate }) {
             {projectStats.map(stat => (
               <div key={stat.key}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '14px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '16px' }}>{plannerMeta[stat.key]?.icon || '📌'}</span> {stat.label}
+                  <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                    {stat.label}
                   </span>
-                  <span style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 600 }}>{stat.progress}% / 100%</span>
+                  <span style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 600 }}>{stat.progress}%</span>
                 </div>
                 <div style={{ height: '8px', background: stat.bg, borderRadius: '4px', overflow: 'hidden' }}>
                   <div style={{ height: '100%', background: stat.color, width: `${stat.progress}%`, borderRadius: '4px', transition: 'width 0.5s ease-out' }}></div>
