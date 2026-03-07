@@ -6,6 +6,37 @@ import MainDashboard from './pages/MainDashboard';
 import { supabase } from './lib/supabase';
 import './index.css';
 
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '40px', textAlign: 'center', fontFamily: 'sans-serif' }}>
+          <h2 style={{ color: '#E44332' }}>Something went wrong.</h2>
+          <pre style={{ background: '#f5f5f5', padding: '20px', borderRadius: '8px', textAlign: 'left', overflowX: 'auto' }}>
+            {this.state.error?.toString()}
+          </pre>
+          <button 
+            onClick={() => window.location.href = '/'}
+            style={{ marginTop: '20px', padding: '10px 20px', background: '#202020', color: 'white', borderRadius: '5px', border: 'none', cursor: 'pointer' }}
+          >
+            Return to Home
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 // Main App Component
 export default function App() {
   const [session, setSession] = useState(null);
@@ -52,24 +83,26 @@ export default function App() {
   }
 
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public Routes - Auto-redirect to /app if session exists */}
-        <Route path="/" element={session ? <Navigate to="/app" replace /> : <LandingPage />} />
-        <Route path="/login" element={session ? <Navigate to="/app" replace /> : <AuthPage mode="login" />} />
-        <Route path="/signup" element={session ? <Navigate to="/app" replace /> : <AuthPage mode="signup" />} />
+    <ErrorBoundary>
+      <BrowserRouter>
+        <Routes>
+          {/* Public Routes - Auto-redirect to /app if session exists */}
+          <Route path="/" element={session ? <Navigate to="/app" replace /> : <LandingPage />} />
+          <Route path="/login" element={session ? <Navigate to="/app" replace /> : <AuthPage mode="login" />} />
+          <Route path="/signup" element={session ? <Navigate to="/app" replace /> : <AuthPage mode="signup" />} />
 
-        {/* Protected App Routes - Auto-redirect to /login if no session */}
-        <Route 
-          path="/app/*" 
-          element={
-            session ? <MainDashboard /> : <Navigate to="/login" replace />
-          } 
-        />
-        
-        {/* Catch all */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+          {/* Protected App Routes - Auto-redirect to /login if no session */}
+          <Route 
+            path="/app/*" 
+            element={
+              session ? <MainDashboard /> : <Navigate to="/login" replace />
+            } 
+          />
+          
+          {/* Catch all */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
