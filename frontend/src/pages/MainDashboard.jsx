@@ -11,6 +11,10 @@ import Calendar from '../components/Calendar';
 import GoalPlanner from '../components/GoalPlanner';
 import Analytics from '../components/Analytics';
 import AIAssistant from '../components/AIAssistant';
+import Pricing from '../components/Pricing';
+import Settings from '../components/Settings';
+import TaskModal from '../components/TaskModal';
+import RightRail from '../components/RightRail';
 import { 
   fetchTasks, createTask, updateTask, deleteTask, 
   fetchHabits, toggleHabitDay 
