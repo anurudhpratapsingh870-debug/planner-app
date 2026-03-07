@@ -36,6 +36,21 @@ export default function LandingPage() {
     }}>
       
       <style>{`
+        /* Apple-style smooth scrollbar */
+        ::-webkit-scrollbar {
+          width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+          background: rgba(0, 0, 0, 0.1);
+          border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background: rgba(0, 0, 0, 0.2);
+        }
+
         @keyframes marquee {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
@@ -47,8 +62,8 @@ export default function LandingPage() {
         }
         .scroll-reveal {
           opacity: 0;
-          transform: translateY(30px);
-          transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+          transform: translateY(40px);
+          transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .scroll-reveal.visible {
           opacity: 1;
@@ -61,6 +76,12 @@ export default function LandingPage() {
         .btn-hover:hover {
           filter: brightness(0.9);
           transform: scale(1.02);
+        }
+        .parallax-hero {
+          transform: translateY(${scrollY * 0.1}px);
+        }
+        .section-padding {
+          padding: 160px 40px;
         }
       `}</style>
 
@@ -126,7 +147,7 @@ export default function LandingPage() {
         </div>
         
         {/* Hero Illustration Mockup */}
-        <div style={{ flex: '1 1 500px', position: 'relative' }}>
+        <div style={{ flex: '1 1 500px', position: 'relative' }} className="parallax-hero">
           <div style={{ 
             background: 'rgba(255,107,95,0.05)', borderRadius: '30px', padding: '40px',
             boxShadow: '0 40px 80px rgba(0,0,0,0.05)', animation: 'float 8s ease-in-out infinite' 
@@ -176,7 +197,7 @@ export default function LandingPage() {
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px' }}>
         
         {/* Section 1: Capture */}
-        <div className="scroll-reveal" style={{ display: 'flex', alignItems: 'center', gap: '100px', marginBottom: '150px', flexWrap: 'wrap-reverse' }}>
+        <div className="scroll-reveal section-padding" style={{ display: 'flex', alignItems: 'center', gap: '100px', flexWrap: 'wrap-reverse' }}>
           <div style={{ flex: '1 1 450px' }}>
             <img 
               src="https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&q=80&w=800" 
@@ -195,7 +216,7 @@ export default function LandingPage() {
         </div>
 
         {/* Section 2: Organize */}
-        <div className="scroll-reveal" style={{ display: 'flex', alignItems: 'center', gap: '100px', marginBottom: '150px', flexWrap: 'wrap' }}>
+        <div className="scroll-reveal section-padding" style={{ display: 'flex', alignItems: 'center', gap: '100px', flexWrap: 'wrap' }}>
           <div style={{ flex: '1 1 450px' }}>
             <h4 style={{ color: '#E44332', fontSize: 13, fontWeight: 700, textTransform: 'uppercase', marginBottom: 12 }}>Organization</h4>
             <h2 style={{ fontSize: 40, fontWeight: 800, marginBottom: 24, lineHeight: 1.1 }}>Stay organized and focused</h2>
