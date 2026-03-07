@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import '../index.css';
 import Sidebar from '../components/Sidebar';
 import Dashboard from '../components/Dashboard';
@@ -16,11 +17,16 @@ import RightRail from '../components/RightRail';
 import { fetchTasks, createTask, updateTask, deleteTask, fetchHabits, toggleHabitDay } from '../services/api';
 
 export default function MainDashboard() {
-  const [activeView, setActiveView] = useState('dashboard');
+  const navigate = useNavigate();
+  const location = useLocation();
   const [tasks, setTasks] = useState([]);
   const [habits, setHabits] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  // Derive active view from URL
+  const pathParts = location.pathname.split('/');
+  const activeView = pathParts[2] || 'dashboard';
 
   // Load data
   useEffect(() => {
@@ -100,8 +106,11 @@ export default function MainDashboard() {
     settings:  '⚙️ Settings',
   };
 
-  // Render active view
-  const renderView = () => {
+  const handleNavigate = (view) => {
+    navigate(`/app/${view}`);
+  };
+
+  const MainContent = () => {
     if (loading) {
       return (
         <div className="page-content">
@@ -113,55 +122,51 @@ export default function MainDashboard() {
       );
     }
 
-    switch (activeView) {
-      case 'dashboard':
-        return <Dashboard tasks={tasks} onNavigate={setActiveView} />;
-      case 'timeline':
-        return <Timeline tasks={tasks} />;
-      case 'goals':
-        return <GoalPlanner tasks={tasks} />;
-      case 'analytics':
-        return <Analytics />;
-      case 'ai':
-        return <AIAssistant />;
-      case 'settings':
-        return <Settings />;
-      case 'exam':
-        return (
+    return (
+      <Routes>
+        <Route path="/" element={<Dashboard tasks={tasks} onNavigate={handleNavigate} />} />
+        <Route path="dashboard" element={<Dashboard tasks={tasks} onNavigate={handleNavigate} />} />
+        <Route path="timeline" element={<Timeline tasks={tasks} />} />
+        <Route path="goals" element={<GoalPlanner tasks={tasks} />} />
+        <Route path="analytics" element={<Analytics />} />
+        <Route path="ai" element={<AIAssistant />} />
+        <Route path="settings" element={<Settings />} />
+        <Route path="exam" element={
           <ExamPlanner
             tasks={tasks}
             onToggleTask={handleToggleTask}
             onDeleteTask={handleDeleteTask}
             onAddTask={() => setShowModal(true)}
           />
-        );
-      case 'habits':
-        return <HabitTracker habits={habits} onToggleDay={handleToggleHabit} />;
-      case 'calendar':
-        return <Calendar tasks={tasks} />;
-      case 'school':
-      case 'ug':
-      case 'daily':
-      case 'office':
-        return (
-          <PlannerView
-            type={activeView}
-            tasks={tasks}
-            onToggleTask={handleToggleTask}
-            onDeleteTask={handleDeleteTask}
-            onAddTask={() => setShowModal(true)}
+        } />
+        <Route path="habits" element={<HabitTracker habits={habits} onToggleDay={handleToggleHabit} />} />
+        <Route path="calendar" element={<Calendar tasks={tasks} />} />
+        {['school', 'ug', 'daily', 'office'].map(type => (
+          <Route 
+            key={type} 
+            path={type} 
+            element={
+              <PlannerView
+                type={type}
+                tasks={tasks}
+                onToggleTask={handleToggleTask}
+                onDeleteTask={handleDeleteTask}
+                onAddTask={() => setShowModal(true)}
+              />
+            } 
           />
-        );
-      default:
-        return <Dashboard tasks={tasks} onNavigate={setActiveView} />;
-    }
+        ))}
+        {/* Fallback for /app/any-unknown */}
+        <Route path="*" element={<Navigate to="/app" replace />} />
+      </Routes>
+    );
   };
 
   return (
     <div className="app-layout" style={{ display: 'flex', height: '100vh', width: '100vw', background: 'var(--bg-primary)' }}>
       <Sidebar
         activeView={activeView}
-        onNavigate={setActiveView}
+        onNavigate={handleNavigate}
         taskCounts={taskCounts}
       />
 
@@ -176,7 +181,7 @@ export default function MainDashboard() {
         </header>
 
         <div style={{ flex: 1, overflowY: 'auto' }}>
-          {renderView()}
+          <MainContent />
         </div>
       </main>
 

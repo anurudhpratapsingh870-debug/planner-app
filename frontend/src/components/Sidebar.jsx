@@ -1,4 +1,6 @@
 import React from 'react';
+import { supabase } from '../lib/supabase';
+import { useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Calendar, ClipboardList, Target, 
   BarChart3, BrainCircuit, Settings, LogOut, Flame,
@@ -6,6 +8,13 @@ import {
 } from 'lucide-react';
 
 export default function Sidebar({ activeView, onNavigate, taskCounts }) {
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate('/');
+  };
+
   const NavItem = ({ id, icon, label, count }) => (
     <button 
       onClick={() => onNavigate(id)}
@@ -65,7 +74,10 @@ export default function Sidebar({ activeView, onNavigate, taskCounts }) {
 
       <div style={{ marginTop: 'auto', borderTop: '1px solid var(--border-color)', paddingTop: '20px' }}>
         <NavItem id="settings" label="Settings" icon={<Settings size={18} />} />
-        <button style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', color: 'var(--danger)', fontSize: '14px', fontWeight: 600, border: 'none', background: 'transparent', cursor: 'pointer', marginTop: '8px' }}>
+        <button 
+          onClick={handleSignOut}
+          style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', color: 'var(--danger)', fontSize: '14px', fontWeight: 600, border: 'none', background: 'transparent', cursor: 'pointer', marginTop: '8px' }}
+        >
           <LogOut size={18} /> Sign Out
         </button>
       </div>
