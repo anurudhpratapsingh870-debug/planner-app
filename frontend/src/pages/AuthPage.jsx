@@ -39,10 +39,16 @@ export default function AuthPage({ mode }) {
 
   const handleGoogleLogin = async () => {
     try {
+      // Determine the correct redirect URL for mobile vs web
+      const isNative = window.location.hostname === 'localhost';
+      const redirectTo = isNative 
+        ? 'com.antigravity.lifeos://login-callback'
+        : window.location.origin + '/app';
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin + '/app'
+          redirectTo: redirectTo
         }
       });
       if (error) throw error;

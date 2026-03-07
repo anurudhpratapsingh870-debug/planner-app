@@ -4,6 +4,8 @@ import LandingPage from './pages/LandingPage';
 import AuthPage from './pages/AuthPage';
 import MainDashboard from './pages/MainDashboard';
 import { supabase } from './lib/supabase';
+import { App as CapacitorApp } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 import './index.css';
 
 class ErrorBoundary extends React.Component {
@@ -66,6 +68,21 @@ export default function App() {
         }
       }
     });
+
+    // 3. Handle Deep Linking for Mobile vs Web
+    if (Capacitor.isNativePlatform()) {
+      CapacitorApp.addListener('appUrlOpen', async (data) => {
+        // Correct way to handle fragment: use # for tokens
+        const url = new URL(data.url.replace('#', '?'));
+        const access_token = url.searchParams.get('access_token');
+        const refresh_token = url.searchParams.get('refresh_token');
+
+        if (access_token && refresh_token) {
+          await supabase.auth.setSession({ access_token, refresh_token });
+          window.dispatchEvent(new CustomEvent('auth-success'));
+        }
+      });
+    }
 
     return () => subscription.unsubscribe();
   }, []);
