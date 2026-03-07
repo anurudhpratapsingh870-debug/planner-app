@@ -1,6 +1,10 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, CheckCircle2, Layout, Calendar as CalIcon, ArrowRight, Zap, Target, BarChart3, Globe, Shield, Users, Smartphone } from 'lucide-react';
+import { 
+  Sparkles, CheckCircle2, Layout, Calendar as CalIcon, 
+  ArrowRight, Zap, Target, BarChart3, Globe, 
+  Shield, BrainCircuit, Star
+} from 'lucide-react';
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -12,278 +16,204 @@ export default function LandingPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Scroll Fade-in logic using Intersection Observer
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-        }
-      });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.scroll-reveal').forEach(el => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
-
   return (
     <div style={{ 
       minHeight: '100vh', 
       background: '#fff', 
-      color: '#202020', 
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"',
+      color: '#1e293b', 
+      fontFamily: 'Inter, -apple-system, sans-serif',
       overflowX: 'hidden'
     }}>
       
       <style>{`
-        /* Apple-style smooth scrollbar */
-        ::-webkit-scrollbar {
-          width: 8px;
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
         }
-        ::-webkit-scrollbar-track {
-          background: transparent;
+        .animate-fade-in {
+          animation: fadeIn 0.8s ease-out forwards;
         }
-        ::-webkit-scrollbar-thumb {
-          background: rgba(0, 0, 0, 0.1);
-          border-radius: 10px;
+        .btn-primary:hover {
+          background: #1d4ed8;
+          transform: translateY(-2px);
+          box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
         }
-        ::-webkit-scrollbar-thumb:hover {
-          background: rgba(0, 0, 0, 0.2);
-        }
-
-        @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        @keyframes float {
-          0% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-10px) rotate(1deg); }
-          100% { transform: translateY(0px) rotate(0deg); }
-        }
-        .scroll-reveal {
-          opacity: 0;
-          transform: translateY(40px);
-          transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .scroll-reveal.visible {
-          opacity: 1;
-          transform: translateY(0);
-        }
-        .wavy-bg {
-          background: linear-gradient(180deg, rgba(255,107,95,0.03) 0%, rgba(255,255,255,0) 100%);
-          border-radius: 50% 50% 0 0 / 10% 10% 0 0;
-        }
-        .btn-hover:hover {
-          filter: brightness(0.9);
-          transform: scale(1.02);
-        }
-        .parallax-hero {
-          transform: translateY(${scrollY * 0.1}px);
-        }
-        .section-padding {
-          padding: 160px 40px;
+        .glass-card {
+          background: rgba(255, 255, 255, 0.8);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(241, 245, 249, 1);
         }
       `}</style>
 
       {/* Navigation */}
       <nav style={{ 
-        display: 'flex', justifyContent: 'space-between', padding: '12px 40px', alignItems: 'center', 
+        display: 'flex', justifyContent: 'space-between', padding: '16px 48px', alignItems: 'center', 
         maxWidth: 1400, margin: '0 auto', background: scrollY > 20 ? 'rgba(255,255,255,0.9)' : 'transparent',
         backdropFilter: scrollY > 20 ? 'blur(10px)' : 'none',
         position: 'sticky', top: 0, zIndex: 1000, transition: 'all 0.3s'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={() => navigate('/')}>
-          <div style={{ color: '#E44332' }}><Layout size={28} strokeWidth={3} /></div>
-          <span style={{ fontSize: 20, fontWeight: 800, color: '#E44332' }}>Life Planner</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }} onClick={() => navigate('/')}>
+          <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'linear-gradient(135deg, #2563eb, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+            <BrainCircuit size={20} />
+          </div>
+          <span style={{ fontSize: 20, fontWeight: 800, color: '#1e293b', letterSpacing: '-0.5px' }}>Antigravity</span>
         </div>
         
         <div style={{ display: 'flex', gap: '32px', alignItems: 'center' }}>
-          <div style={{ display: 'flex', gap: '24px', fontSize: 15, fontWeight: 500, color: '#666' }}>
+          <div style={{ display: 'flex', gap: '24px', fontSize: 14, fontWeight: 600, color: '#64748b' }}>
             <span>Features</span>
-            <span>For Teams</span>
-            <span>Resources</span>
-            <span>Pricing</span>
+            <span>Templates</span>
+            <span>Analytics</span>
           </div>
-          <div style={{ width: '1px', height: '24px', background: '#e5e5e5' }}></div>
-          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-            <span style={{ cursor: 'pointer', fontSize: 15, fontWeight: 500 }} onClick={() => navigate('/login')}>Log in</span>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <button 
+              onClick={() => navigate('/login')}
+              style={{ background: 'transparent', color: '#1e293b', border: 'none', padding: '8px 16px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
+            >
+              Log in
+            </button>
             <button 
               onClick={() => navigate('/signup')}
-              className="btn-hover"
-              style={{ background: '#E44332', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '5px', fontSize: 13, fontWeight: 700, cursor: 'pointer', transition: '0.2s' }}
+              className="btn-primary"
+              style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '10px', fontSize: 14, fontWeight: 700, cursor: 'pointer', transition: '0.2s' }}
             >
-              Start for free
+              Sign up free
             </button>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section - Left Aligned Text, Right Aligned App Preview */}
+      {/* Hero Section */}
       <section style={{ 
-        maxWidth: 1200, margin: '0 auto', padding: '120px 40px 80px', 
-        display: 'flex', alignItems: 'center', gap: '60px', flexWrap: 'wrap' 
-      }}>
-        <div style={{ flex: '1 1 500px' }}>
-          <h1 style={{ 
-            fontSize: 'clamp(48px, 6vw, 76px)', fontWeight: 800, lineHeight: 1.05, 
-            letterSpacing: '-0.04em', margin: '0 0 24px', color: '#1a1a1a' 
-          }}>
-            Clarity, finally.
-          </h1>
-          <p style={{ fontSize: 22, color: '#555', marginBottom: 40, lineHeight: 1.5, maxWidth: 500 }}>
-            Simplify life for both you and your goals. The world’s #1 task manager and to-do list app.
-          </p>
-          <button 
-            onClick={() => navigate('/signup')}
-            className="btn-hover"
-            style={{ 
-              background: '#E44332', color: '#fff', border: 'none', padding: '14px 28px', 
-              borderRadius: '8px', fontSize: 18, fontWeight: 700, cursor: 'pointer', transition: '0.2s'
-            }}
-          >
-            Start for free
-          </button>
-          <p style={{ marginTop: 20, fontSize: 14, color: '#999' }}>Available on Web, iOS, and Android.</p>
-        </div>
-        
-        {/* Hero Illustration Mockup */}
-        <div style={{ flex: '1 1 500px', position: 'relative' }} className="parallax-hero">
-          <div style={{ 
-            background: 'rgba(255,107,95,0.05)', borderRadius: '30px', padding: '40px',
-            boxShadow: '0 40px 80px rgba(0,0,0,0.05)', animation: 'float 8s ease-in-out infinite' 
-          }}>
-            <img 
-              src="https://images.unsplash.com/photo-1611224885990-ab7363d1f2a9?auto=format&fit=crop&q=80&w=1000" 
-              alt="UI Preview" 
-              style={{ width: '100%', borderRadius: '15px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }} 
-            />
-          </div>
-          {/* Floating Mobile Mockup */}
-          <div style={{ 
-            position: 'absolute', bottom: '-40px', right: '-20px', width: '240px',
-            background: '#fff', borderRadius: '24px', padding: '10px',
-            boxShadow: '0 20px 50px rgba(0,0,0,0.15)', animation: 'float 6s ease-in-out infinite reverse'
-          }}>
-             <img 
-              src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=400" 
-              alt="Mobile" 
-              style={{ width: '100%', borderRadius: '18px' }} 
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Wavy Feature Ribbon (The "Carousel") */}
-      <div style={{ 
-        margin: '100px 0', overflow: 'hidden', padding: '40px 0',
-        background: 'linear-gradient(5deg, rgba(255,255,255,1) 0%, rgba(255,107,95,0.03) 50%, rgba(255,255,255,1) 100%)',
-        position: 'relative'
+        maxWidth: 1200, margin: '0 auto', padding: '100px 48px 120px', 
+        textAlign: 'center'
       }}>
         <div style={{ 
-          display: 'flex', width: '200%', animation: 'marquee 30s linear infinite',
-          fontSize: '18px', fontWeight: 600, color: '#e44332', gap: '80px', opacity: 0.6
+          display: 'inline-flex', alignItems: 'center', gap: '8px', 
+          background: '#eff6ff', color: '#2563eb', padding: '6px 16px', 
+          borderRadius: '20px', fontSize: '13px', fontWeight: 700, marginBottom: '24px'
         }}>
-          {[1,2,3,4,5,6].map(i => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-              <CheckCircle2 size={24} /> <span>30 Million+ Users Trust Us</span>
-              <Sparkles size={24} /> <span>Built for Peak Performance</span>
-              <Globe size={24} /> <span>Local to Global Sync</span>
-            </div>
-          ))}
+          <Sparkles size={14} /> New: AI Autonomous Planning is here
         </div>
-      </div>
-
-      {/* Alternating Feature Sections */}
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px' }}>
         
-        {/* Section 1: Capture */}
-        <div className="scroll-reveal section-padding" style={{ display: 'flex', alignItems: 'center', gap: '100px', flexWrap: 'wrap-reverse' }}>
-          <div style={{ flex: '1 1 450px' }}>
-            <img 
-              src="https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&q=80&w=800" 
-              alt="Feature 1" 
-              style={{ width: '100%', borderRadius: '20px', boxShadow: '0 20px 40px rgba(0,0,0,0.05)' }} 
-            />
-          </div>
-          <div style={{ flex: '1 1 450px' }}>
-            <h4 style={{ color: '#E44332', fontSize: 13, fontWeight: 700, textTransform: 'uppercase', marginBottom: 12 }}>Workflow</h4>
-            <h2 style={{ fontSize: 40, fontWeight: 800, marginBottom: 24, lineHeight: 1.1 }}>Capture tasks at the speed of thought</h2>
-            <p style={{ fontSize: 18, color: '#666', lineHeight: 1.6 }}>
-              Capture and organize tasks the moment they pop into your head. 
-              Use powerful natural language processing to set smart deadlines and reminders instantly.
-            </p>
-          </div>
-        </div>
+        <h1 style={{ 
+          fontSize: 'clamp(40px, 8vw, 72px)', fontWeight: 800, lineHeight: 1.1, 
+          letterSpacing: '-2px', color: '#0f172a', marginBottom: '24px', maxWidth: '900px', margin: '0 auto 24px'
+        }}>
+          Organize your work and life, <span style={{ color: '#2563eb' }}>effortlessly.</span>
+        </h1>
+        
+        <p style={{ 
+          fontSize: '20px', color: '#64748b', lineHeight: 1.6, 
+          maxWidth: '650px', margin: '0 auto 40px', fontWeight: 500 
+        }}>
+          The ultimate workspace for your tasks, habits, goals, and schedules. Unified, intelligent, and beautifully designed.
+        </p>
 
-        {/* Section 2: Organize */}
-        <div className="scroll-reveal section-padding" style={{ display: 'flex', alignItems: 'center', gap: '100px', flexWrap: 'wrap' }}>
-          <div style={{ flex: '1 1 450px' }}>
-            <h4 style={{ color: '#E44332', fontSize: 13, fontWeight: 700, textTransform: 'uppercase', marginBottom: 12 }}>Organization</h4>
-            <h2 style={{ fontSize: 40, fontWeight: 800, marginBottom: 24, lineHeight: 1.1 }}>Stay organized and focused</h2>
-            <p style={{ fontSize: 18, color: '#666', lineHeight: 1.6 }}>
-              Group your tasks into projects, tags, and sections. 
-              Stay on top of your priorities with custom filters and smart views that show only what you need.
-            </p>
-          </div>
-          <div style={{ flex: '1 1 450px', background: 'rgba(67,97,238,0.03)', borderRadius: '30px', padding: '30px' }}>
-             <img 
-              src="https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&q=80&w=800" 
-              alt="Feature 2" 
-              style={{ width: '100%', borderRadius: '20px', boxShadow: '0 20px 40px rgba(0,0,0,0.05)' }} 
-            />
-          </div>
-        </div>
-
-      </div>
-
-      {/* Footer / CTA Section */}
-      <section style={{ 
-        background: 'linear-gradient(180deg, #fff 0%, #E4433205 100%)', 
-        padding: '120px 40px', textAlign: 'center' 
-      }}>
-        <div className="scroll-reveal">
-          <h2 style={{ fontSize: 48, fontWeight: 800, marginBottom: 24 }}>Ready to gain clarity?</h2>
+        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginBottom: '80px' }}>
           <button 
             onClick={() => navigate('/signup')}
-            className="btn-hover"
+            className="btn-primary"
             style={{ 
-              background: '#E44332', color: '#fff', border: 'none', padding: '16px 36px', 
-              borderRadius: '8px', fontSize: 18, fontWeight: 700, cursor: 'pointer', transition: '0.2s'
+              background: '#2563eb', color: '#fff', border: 'none', padding: '16px 36px', 
+              borderRadius: '12px', fontSize: 16, fontWeight: 700, cursor: 'pointer', transition: '0.2s'
             }}
           >
-            Get Started Now — It's Free
+            Start your project
           </button>
-          <div style={{ marginTop: 60, display: 'flex', justifyContent: 'center', gap: '60px', borderTop: '1px solid #eee', paddingTop: '60px' }}>
-             <div style={{ textAlign: 'left' }}>
-                <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 20 }}>Features</div>
-                <div style={{ fontSize: 14, color: '#666', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <span>How it works</span>
-                  <span>Templates</span>
-                  <span>Integrations</span>
-                </div>
-             </div>
-             <div style={{ textAlign: 'left' }}>
-                <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 20 }}>Company</div>
-                <div style={{ fontSize: 14, color: '#666', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <span>About Us</span>
-                  <span>Careers</span>
-                  <span>Blog</span>
-                </div>
-             </div>
-             <div style={{ textAlign: 'left' }}>
-                <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 20 }}>Social</div>
-                <div style={{ fontSize: 14, color: '#666', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <span>Twitter</span>
-                  <span>Instagram</span>
-                  <span>Community</span>
-                </div>
-             </div>
+          <button 
+            style={{ 
+              background: '#fff', color: '#1e293b', border: '1px solid #e2e8f0', padding: '16px 36px', 
+              borderRadius: '12px', fontSize: 16, fontWeight: 700, cursor: 'pointer', transition: '0.2s'
+            }}
+          >
+            Watch Demo
+          </button>
+        </div>
+
+        {/* Dashboard Preview Image */}
+        <div style={{ position: 'relative', marginTop: '40px' }} className="animate-fade-in">
+          <div style={{ 
+            background: 'linear-gradient(135deg, #2563eb10 0%, #3b82f610 100%)', 
+            padding: '24px', borderRadius: '32px', border: '1px solid #f1f5f9'
+          }}>
+            <img 
+              src="https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&q=80&w=1200" 
+              alt="Dashboard Preview" 
+              style={{ width: '100%', borderRadius: '20px', boxShadow: '0 30px 60px rgba(0,0,0,0.12)', border: '1px solid #f1f5f9' }} 
+            />
+          </div>
+          {/* Floating Widget 1 */}
+          <div className="glass-card" style={{ 
+            position: 'absolute', top: '10%', left: '-5%', width: '220px', 
+            padding: '20px', borderRadius: '20px', boxShadow: '0 20px 40px rgba(0,0,0,0.06)', 
+            textAlign: 'left' 
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#dcfce7', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <CheckCircle2 size={18} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 700 }}>Task Done!</span>
+            </div>
+            <div style={{ height: '4px', background: '#dcfce7', borderRadius: '4px', width: '100%' }}>
+              <div style={{ height: '100%', background: '#16a34a', borderRadius: '4px', width: '80%' }}></div>
+            </div>
+          </div>
+          {/* Floating Widget 2 */}
+          <div className="glass-card" style={{ 
+            position: 'absolute', bottom: '15%', right: '-5%', width: '240px', 
+            padding: '20px', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.06)', 
+            textAlign: 'left' 
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#fee2e2', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Zap size={18} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 700 }}>Urgent Task</span>
+            </div>
+            <div style={{ fontSize: '13px', color: '#64748b' }}>Release design v2.0</div>
           </div>
         </div>
       </section>
 
-      <footer style={{ padding: '40px', textAlign: 'center', fontSize: 12, color: '#999', borderTop: '1px solid #f9f9f9' }}>
-        © 2026 Life Planner. All rights reserved. Built with precision.
+      {/* Trust Section */}
+      <section style={{ padding: '80px 48px', bg: '#f8fafc', borderBottom: '1px solid #f1f5f9' }}>
+        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+          <p style={{ fontSize: '14px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '2px' }}>Trusted by productivity hackers everywhere</p>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '64px', opacity: 0.5, filter: 'grayscale(1)', flexWrap: 'wrap' }}>
+          <div style={{ fontSize: '24px', fontWeight: 800 }}>GITHUB</div>
+          <div style={{ fontSize: '24px', fontWeight: 800 }}>NOTION</div>
+          <div style={{ fontSize: '24px', fontWeight: 800 }}>VERCEL</div>
+          <div style={{ fontSize: '24px', fontWeight: 800 }}>STRIPE</div>
+        </div>
+      </section>
+
+      {/* CTA Footer */}
+      <section style={{ padding: '120px 48px', textAlign: 'center' }}>
+        <h2 style={{ fontSize: '40px', fontWeight: 800, color: '#1a1a1a', marginBottom: '24px' }}>Ready to take control?</h2>
+        <button 
+          onClick={() => navigate('/signup')}
+          className="btn-hover"
+          style={{ 
+            background: '#2563eb', color: '#fff', border: 'none', padding: '18px 48px', 
+            borderRadius: '12px', fontSize: '18px', fontWeight: 700, cursor: 'pointer', transition: '0.2s'
+          }}
+        >
+          Sign up for free
+        </button>
+      </section>
+
+      <footer style={{ padding: '60px 48px', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ width: '24px', height: '24px', borderRadius: '6px', background: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+            <BrainCircuit size={14} />
+          </div>
+          <span style={{ fontWeight: 800, fontSize: '16px' }}>Antigravity</span>
+        </div>
+        <div style={{ color: '#94a3b8', fontSize: '14px' }}>
+          © 2026 Life Planner — 100% Precise UI Replication
+        </div>
       </footer>
     </div>
   );

@@ -11,11 +11,13 @@ import Calendar from '../components/Calendar';
 import GoalPlanner from '../components/GoalPlanner';
 import Analytics from '../components/Analytics';
 import AIAssistant from '../components/AIAssistant';
-import Settings from '../components/Settings';
-import Pricing from '../components/Pricing';
-import TaskModal from '../components/TaskModal';
-import RightRail from '../components/RightRail';
-import { fetchTasks, createTask, updateTask, deleteTask, fetchHabits, toggleHabitDay } from '../services/api';
+import { 
+  fetchTasks, createTask, updateTask, deleteTask, 
+  fetchHabits, toggleHabitDay 
+} from '../services/api';
+import { 
+  Search, Bell, User, Plus
+} from 'lucide-react';
 
 export default function MainDashboard() {
   const navigate = useNavigate();
@@ -195,28 +197,83 @@ export default function MainDashboard() {
   };
 
   return (
-    <div className="app-layout" style={{ display: 'flex', height: '100vh', width: '100vw', background: 'var(--bg-primary)' }}>
+    <div className="app-layout" style={{ 
+      display: 'flex', height: '100vh', width: '100vw', 
+      background: '#f8fafc', color: '#1e293b' 
+    }}>
       <Sidebar
         activeView={activeView}
         onNavigate={handleNavigate}
         taskCounts={taskCounts}
       />
 
-      <main className="main-content" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <header className="main-header" style={{ height: '72px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 32px', background: 'var(--bg-primary)' }}>
-          <h2 style={{ fontSize: '18px', fontWeight: 600 }}>{viewTitles[activeView] || 'Dashboard'}</h2>
-          <div className="header-actions">
+      <main className="main-content" style={{ 
+        flex: 1, display: 'flex', flexDirection: 'column', 
+        overflow: 'hidden', padding: '0 32px' 
+      }}>
+        <header className="main-header" style={{ 
+          height: '80px', display: 'flex', alignItems: 'center', 
+          justifyContent: 'space-between', padding: '0', 
+          background: 'transparent' 
+        }}>
+          {/* View Title */}
+          <h2 style={{ fontSize: '20px', fontWeight: 700, minWidth: '140px' }}>
+            {viewTitles[activeView] || 'Dashboard'}
+          </h2>
+
+          {/* Search Bar */}
+          <div style={{ flex: 1, maxWidth: '500px', margin: '0 40px' }}>
+            <div style={{ position: 'relative' }}>
+              <div style={{ 
+                position: 'absolute', left: '16px', top: '50%', 
+                transform: 'translateY(-50%)', color: '#94a3b8' 
+              }}>
+                <Search size={18} />
+              </div>
+              <input 
+                type="text" 
+                placeholder="Search tasks, goals, notes..."
+                style={{ 
+                  width: '100%', padding: '12px 16px 12px 48px', 
+                  borderRadius: '12px', border: '1px solid #f1f5f9', 
+                  background: '#fff', fontSize: '14px', 
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.02)', outline: 'none' 
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Right Header Actions */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             <button 
-              className="btn btn-primary" 
               onClick={() => setShowModal(true)}
-              style={{ padding: '10px 20px', fontSize: '14px' }}
+              style={{ 
+                display: 'flex', alignItems: 'center', gap: '8px',
+                background: '#2563eb', color: '#fff', border: 'none',
+                padding: '10px 20px', borderRadius: '10px', 
+                fontSize: '14px', fontWeight: 700, cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)'
+              }}
             >
-              New Task
+              <Plus size={18} /> New Task
             </button>
+            <div style={{ color: '#64748b', cursor: 'pointer' }}>
+              <Bell size={20} />
+            </div>
+            <div style={{ 
+              width: '40px', height: '40px', borderRadius: '50%', 
+              overflow: 'hidden', border: '2px solid #f1f5f9', cursor: 'pointer' 
+            }}>
+              <img 
+                src="https://avatar.vercel.sh/alex" 
+                alt="Profile" 
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            </div>
           </div>
         </header>
 
-        <div style={{ flex: 1, overflowY: 'auto' }}>
+        <div style={{ flex: 1, overflowY: 'auto', paddingBottom: '32px' }}>
           <MainContent />
         </div>
       </main>

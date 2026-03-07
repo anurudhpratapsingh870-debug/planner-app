@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { 
-  LayoutDashboard, Calendar, ClipboardList, Target, 
-  BarChart3, BrainCircuit, Settings, LogOut, Flame,
-  Briefcase, GraduationCap, Map, Moon, Sun, Crown
+  LayoutDashboard, Calendar, Map, Target, 
+  CheckSquare, Flame, BarChart3, BrainCircuit,
+  Settings, LogOut, Moon, Sun, Crown, HelpCircle,
+  Briefcase, GraduationCap, ClipboardList
 } from 'lucide-react';
 
 export default function Sidebar({ activeView, onNavigate, taskCounts }) {
@@ -30,43 +31,54 @@ export default function Sidebar({ activeView, onNavigate, taskCounts }) {
         display: 'flex', alignItems: 'center', gap: '12px', width: '100%',
         padding: '10px 12px', borderRadius: '10px', transition: 'all 0.2s',
         border: 'none', background: highlight
-          ? 'linear-gradient(135deg, #4f46e5, #6366f1)'
-          : activeView === id ? 'rgba(79, 70, 229, 0.1)' : 'transparent',
-        cursor: 'pointer', textAlign: 'left', position: 'relative'
+          ? '#2563eb'
+          : activeView === id ? '#eff6ff' : 'transparent',
+        cursor: 'pointer', textAlign: 'left', position: 'relative',
+        marginBottom: '2px'
       }}
     >
-      <div style={{ color: highlight ? '#fff' : activeView === id ? '#4f46e5' : 'var(--text-muted)' }}>{icon}</div>
-      <span style={{ fontSize: '14px', fontWeight: highlight ? 700 : activeView === id ? 600 : 500, color: highlight ? '#fff' : activeView === id ? 'var(--text-primary)' : 'var(--text-secondary)', flex: 1 }}>{label}</span>
+      <div style={{ color: highlight ? '#fff' : activeView === id ? '#2563eb' : '#64748b' }}>{icon}</div>
+      <span style={{ 
+        fontSize: '14px', 
+        fontWeight: highlight ? 700 : activeView === id ? 600 : 500, 
+        color: highlight ? '#fff' : activeView === id ? '#1e293b' : '#64748b', 
+        flex: 1 
+      }}>{label}</span>
       {count > 0 && (
-        <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 6px', borderRadius: '6px', background: 'var(--bg-glass)', color: 'var(--text-muted)' }}>{count}</span>
-      )}
-      {activeView === id && !highlight && (
-        <div style={{ position: 'absolute', left: '-12px', top: '15%', bottom: '15%', width: '4px', background: '#4f46e5', borderRadius: '0 4px 4px 0' }}></div>
+        <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 6px', borderRadius: '6px', background: 'rgba(0,0,0,0.05)', color: '#64748b' }}>{count}</span>
       )}
     </button>
   );
 
   return (
-    <div className="sidebar" style={{ width: '280px', height: '100vh', padding: '32px 24px', borderRight: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '32px', background: 'var(--bg-primary)', overflowY: 'auto' }}>
+    <div className="sidebar" style={{ 
+      width: '240px', height: '100vh', padding: '24px 16px', 
+      borderRight: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column', 
+      gap: '24px', background: '#fff', overflowY: 'auto' 
+    }}>
       
       {/* Brand */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingLeft: '8px' }}>
-        <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingLeft: '8px', marginBottom: '8px' }}>
+        <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'linear-gradient(135deg, #2563eb, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
           <BrainCircuit size={20} />
         </div>
-        <span style={{ fontSize: '20px', fontWeight: 800, letterSpacing: '-1px' }}>Antigravity</span>
+        <span style={{ fontSize: '18px', fontWeight: 800, letterSpacing: '-0.5px', color: '#1e293b' }}>Antigravity</span>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-        <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px', paddingLeft: '8px' }}>Overview</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        <div style={{ fontSize: '12px', fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', paddingLeft: '12px' }}>Overview</div>
         <NavItem id="dashboard" label="Dashboard" icon={<LayoutDashboard size={18} />} />
         <NavItem id="calendar" label="Calendar" icon={<Calendar size={18} />} />
         <NavItem id="timeline" label="Timeline" icon={<Map size={18} />} />
         <NavItem id="goals" label="Goal Planner" icon={<Target size={18} />} />
+        <NavItem id="tasks" label="Tasks" icon={<CheckSquare size={18} />} />
+        <NavItem id="habits" label="Habits" icon={<Flame size={18} />} />
+        <NavItem id="analytics" label="Analytics" icon={<BarChart3 size={18} />} />
+        <NavItem id="ai" label="AI Planner" icon={<BrainCircuit size={18} />} />
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-        <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px', paddingLeft: '8px' }}>Planners</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        <div style={{ fontSize: '12px', fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', paddingLeft: '12px' }}>Planners</div>
         <NavItem id="school" label="School" icon={<GraduationCap size={18} />} count={taskCounts['school']} />
         <NavItem id="ug" label="UG Planner" icon={<Briefcase size={18} />} count={taskCounts['ug']} />
         <NavItem id="daily" label="Daily" icon={<ClipboardList size={18} />} count={taskCounts['daily']} />
@@ -74,28 +86,18 @@ export default function Sidebar({ activeView, onNavigate, taskCounts }) {
         <NavItem id="exam" label="Study/Exams" icon={<Flame size={18} />} count={taskCounts['exam']} />
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-        <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px', paddingLeft: '8px' }}>Trackers & AI</div>
-        <NavItem id="habits" label="Habits" icon={<Flame size={18} />} />
-        <NavItem id="ai" label="AI Planner" icon={<BrainCircuit size={18} />} />
-        <NavItem id="analytics" label="Analytics" icon={<BarChart3 size={18} />} />
+      <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '4px' }}>
         <NavItem id="pricing" label="Upgrade" icon={<Crown size={18} />} highlight />
-      </div>
-
-      <div style={{ marginTop: 'auto', borderTop: '1px solid var(--border-color)', paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        <button 
-          onClick={toggleTheme}
-          style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', color: 'var(--text-secondary)', fontSize: '14px', fontWeight: 600, border: '1px solid var(--border-color)', borderRadius: '10px', background: 'var(--bg-secondary)', cursor: 'pointer', transition: 'all 0.2s' }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
-            <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
-          </div>
-        </button>
         <NavItem id="settings" label="Settings" icon={<Settings size={18} />} />
+        <NavItem id="help" label="Help & Support" icon={<HelpCircle size={18} />} />
+        <div style={{ height: '1px', background: '#f1f5f9', margin: '12px 0' }}></div>
         <button 
           onClick={handleSignOut}
-          style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', color: 'var(--danger)', fontSize: '14px', fontWeight: 600, border: 'none', background: 'transparent', cursor: 'pointer' }}
+          style={{ 
+            width: '100%', display: 'flex', alignItems: 'center', gap: '12px', 
+            padding: '10px 12px', color: '#ef4444', fontSize: '14px', 
+            fontWeight: 600, border: 'none', background: 'transparent', cursor: 'pointer' 
+          }}
         >
           <LogOut size={18} /> Sign Out
         </button>
