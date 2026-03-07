@@ -67,13 +67,16 @@ export default function AIAssistant({ onCreateTasks }) {
     <div className="page-content" style={{ maxWidth: '900px', margin: '0 auto', height: 'calc(100vh - 120px)', display: 'flex', flexDirection: 'column' }}>
       
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexShrink: 0 }}>
-        <div>
-          <h1 style={{ fontSize: '28px', letterSpacing: '-1px', marginBottom: '4px' }}>AI Autonomous Planner</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Tell me your goal. I'll generate a complete plan and schedule it automatically.</p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexShrink: 0, background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(139, 92, 246, 0.06))', padding: '20px 24px', borderRadius: '16px', border: '1px solid var(--border-color)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <img src="/ai-hero.png" alt="" style={{ width: '64px', height: '64px', objectFit: 'contain', borderRadius: '12px' }} />
+          <div>
+            <h1 style={{ fontSize: '24px', letterSpacing: '-0.5px', marginBottom: '4px', margin: 0 }}>AI Autonomous Planner</h1>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '13px', margin: 0 }}>Describe your goal — AI generates a full plan with tasks, deadlines, and schedules.</p>
+          </div>
         </div>
-        <div style={{ padding: '8px 16px', background: 'rgba(99, 102, 241, 0.1)', borderRadius: '12px', color: 'var(--accent-indigo)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: 600 }}>
-          <BrainCircuit size={16} /> Gemini AI
+        <div style={{ padding: '8px 16px', background: 'rgba(99, 102, 241, 0.1)', borderRadius: '10px', color: 'var(--accent-indigo)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', fontWeight: 700, whiteSpace: 'nowrap' }}>
+          <BrainCircuit size={14} /> Gemini AI
         </div>
       </div>
 

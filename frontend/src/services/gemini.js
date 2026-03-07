@@ -1,5 +1,4 @@
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 const SYSTEM_PROMPT = `You are an AI Life Planner assistant called "Antigravity AI". You help users plan their life by generating structured plans, study schedules, project roadmaps, and productivity advice.
 
@@ -14,39 +13,82 @@ IMPORTANT RULES:
 
 export async function sendToGemini(userMessage, conversationHistory = []) {
   if (!GEMINI_API_KEY) {
-    throw new Error('Gemini API key not configured');
+    throw new Error('Gemini API key not configured. Add VITE_GEMINI_API_KEY to your .env file.');
   }
 
-  const contents = [
-    { role: 'user', parts: [{ text: SYSTEM_PROMPT }] },
-    { role: 'model', parts: [{ text: 'Understood. I am Antigravity AI, your Life Planner assistant. I will generate structured task plans when asked, and provide helpful advice otherwise. How can I help you today?' }] },
-    ...conversationHistory.map(msg => ({
-      role: msg.role === 'user' ? 'user' : 'model',
-      parts: [{ text: msg.text }]
-    })),
-    { role: 'user', parts: [{ text: userMessage }] }
+  // Try multiple model endpoints for robustness
+  const models = [
+    'gemini-1.5-flash',
+    'gemini-2.0-flash',
+    'gemini-pro'
   ];
 
-  const response = await fetch(GEMINI_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents,
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 4096
-      }
-    })
-  });
+  let lastError = null;
 
-  if (!response.ok) {
-    const errData = await response.json().catch(() => ({}));
-    throw new Error(errData.error?.message || `Gemini API error: ${response.status}`);
+  for (const model of models) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+
+      // Build conversation - system prompt as first user message
+      const contents = [];
+      
+      // System instruction as first turn
+      contents.push({ role: 'user', parts: [{ text: SYSTEM_PROMPT }] });
+      contents.push({ role: 'model', parts: [{ text: 'Understood. I am Antigravity AI, your Life Planner assistant. I will generate structured task plans when asked, and provide helpful advice otherwise.' }] });
+
+      // Add previous conversation (last 6 messages for context window safety)
+      const recentHistory = conversationHistory.slice(-6);
+      for (const msg of recentHistory) {
+        contents.push({
+          role: msg.role === 'user' ? 'user' : 'model',
+          parts: [{ text: msg.text }]
+        });
+      }
+
+      // Add current user message
+      contents.push({ role: 'user', parts: [{ text: userMessage }] });
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents,
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 4096
+          }
+        })
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        lastError = errData.error?.message || `API error ${response.status}`;
+        console.warn(`Model ${model} failed: ${lastError}`);
+        continue; // Try next model
+      }
+
+      const data = await response.json();
+      
+      // Check for safety blocks or empty responses
+      if (data.candidates?.[0]?.finishReason === 'SAFETY') {
+        return 'I cannot generate content for that request. Please try rephrasing your goal.';
+      }
+
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!text) {
+        lastError = 'Empty response from model';
+        continue;
+      }
+
+      return text;
+    } catch (err) {
+      lastError = err.message;
+      console.warn(`Model ${model} exception: ${err.message}`);
+      continue;
+    }
   }
 
-  const data = await response.json();
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, I could not generate a response.';
-  return text;
+  throw new Error(`Could not reach AI service. Last error: ${lastError}`);
 }
 
 /**
@@ -54,16 +96,29 @@ export async function sendToGemini(userMessage, conversationHistory = []) {
  * Returns { text: string, tasks: array|null }
  */
 export function parseGeminiResponse(responseText) {
-  const jsonMatch = responseText.match(/```json\s*([\s\S]*?)\s*```/);
+  // Try to find JSON wrapped in code fences
+  const jsonMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
   
   if (jsonMatch) {
     try {
-      const tasks = JSON.parse(jsonMatch[1]);
-      // Extract the text part (everything outside the JSON block)
-      const textPart = responseText.replace(/```json[\s\S]*?```/, '').trim();
-      return { text: textPart || 'Here is your generated plan. Click "Add All Tasks" to import them into your planner.', tasks: Array.isArray(tasks) ? tasks : [tasks] };
+      let parsed = JSON.parse(jsonMatch[1]);
+      // Handle if the JSON is wrapped in an object like { tasks: [...] }
+      if (parsed && !Array.isArray(parsed) && parsed.tasks) {
+        parsed = parsed.tasks;
+      }
+      const tasks = Array.isArray(parsed) ? parsed : [parsed];
+      
+      // Validate task structure
+      const validTasks = tasks.filter(t => t && t.title);
+      if (validTasks.length > 0) {
+        const textPart = responseText.replace(/```(?:json)?[\s\S]*?```/, '').trim();
+        return { 
+          text: textPart || `Generated ${validTasks.length} tasks for your plan. Click "Add All Tasks" to import them into your planner.`, 
+          tasks: validTasks 
+        };
+      }
     } catch (e) {
-      // JSON parsing failed, return as plain text
+      console.warn('JSON parse failed:', e.message);
     }
   }
 
