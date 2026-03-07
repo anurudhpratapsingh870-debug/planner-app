@@ -282,7 +282,7 @@ export default function MainDashboard() {
         </div>
       </main>
 
-      <RightRail tasks={tasks} onEditTask={handleOpenEdit} />
+      <RightRail tasks={tasks} onEditTask={handleOpenEdit} onAddEvent={() => setShowModal(true)} />
 
       {showModal && (
         <TaskModal

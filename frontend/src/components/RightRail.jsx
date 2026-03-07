@@ -5,7 +5,7 @@ import {
   isSameMonth, isSameDay, addDays, isToday, parseISO
 } from 'date-fns';
 
-export default function RightRail({ tasks = [], onEditTask }) {
+export default function RightRail({ tasks = [], onEditTask, onAddEvent }) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
 
@@ -107,14 +107,17 @@ export default function RightRail({ tasks = [], onEditTask }) {
             </div>
           ))}
 
-          <button style={{ 
-            marginTop: '12px', width: '100%', padding: '12px', 
-            borderRadius: '12px', border: '1px solid #f1f5f9', 
-            background: '#fff', color: '#2563eb', fontSize: '14px', 
-            fontWeight: 700, display: 'flex', alignItems: 'center', 
-            justifyContent: 'center', gap: '8px', cursor: 'pointer',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.02)'
-          }}>
+          <button 
+            onClick={onAddEvent}
+            style={{ 
+              marginTop: '12px', width: '100%', padding: '12px', 
+              borderRadius: '12px', border: '1px solid #f1f5f9', 
+              background: '#fff', color: '#2563eb', fontSize: '14px', 
+              fontWeight: 700, display: 'flex', alignItems: 'center', 
+              justifyContent: 'center', gap: '8px', cursor: 'pointer',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.02)'
+            }}
+          >
             <Plus size={18} /> Add Event
           </button>
         </div>
