@@ -13,15 +13,27 @@ export default function App() {
 
   useEffect(() => {
     // 1. Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
+      setSession(initialSession);
       setLoading(false);
+      
+      // Clear hash fragment if it contains auth tokens
+      if (window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('error'))) {
+        window.history.replaceState(null, '', window.location.pathname);
+      }
     });
 
     // 2. Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
+      setSession(newSession);
       setLoading(false);
+      
+      if (event === 'SIGNED_IN') {
+        // Force immediate check of URL to clear fragments
+        if (window.location.hash) {
+          window.history.replaceState(null, '', window.location.pathname);
+        }
+      }
     });
 
     return () => subscription.unsubscribe();
