@@ -1,18 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Calendar, ClipboardList, Target, 
   BarChart3, BrainCircuit, Settings, LogOut, Flame,
-  Briefcase, GraduationCap, Map
+  Briefcase, GraduationCap, Map, Moon, Sun
 } from 'lucide-react';
 
 export default function Sidebar({ activeView, onNavigate, taskCounts }) {
   const navigate = useNavigate();
+  const [theme, setTheme] = useState(document.documentElement.getAttribute('data-theme') || 'light');
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate('/');
+  };
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
   };
 
   const NavItem = ({ id, icon, label, count }) => (
@@ -72,11 +79,20 @@ export default function Sidebar({ activeView, onNavigate, taskCounts }) {
         <NavItem id="analytics" label="Analytics" icon={<BarChart3 size={18} />} />
       </div>
 
-      <div style={{ marginTop: 'auto', borderTop: '1px solid var(--border-color)', paddingTop: '20px' }}>
+      <div style={{ marginTop: 'auto', borderTop: '1px solid var(--border-color)', paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <button 
+          onClick={toggleTheme}
+          style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', color: 'var(--text-secondary)', fontSize: '14px', fontWeight: 600, border: '1px solid var(--border-color)', borderRadius: '10px', background: 'var(--bg-secondary)', cursor: 'pointer', transition: 'all 0.2s' }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+            <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
+          </div>
+        </button>
         <NavItem id="settings" label="Settings" icon={<Settings size={18} />} />
         <button 
           onClick={handleSignOut}
-          style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', color: 'var(--danger)', fontSize: '14px', fontWeight: 600, border: 'none', background: 'transparent', cursor: 'pointer', marginTop: '8px' }}
+          style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', color: 'var(--danger)', fontSize: '14px', fontWeight: 600, border: 'none', background: 'transparent', cursor: 'pointer' }}
         >
           <LogOut size={18} /> Sign Out
         </button>

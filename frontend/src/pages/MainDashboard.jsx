@@ -185,7 +185,7 @@ export default function MainDashboard() {
         </div>
       </main>
 
-      <RightRail />
+      <RightRail tasks={tasks} />
 
       {showModal && (
         <TaskModal
