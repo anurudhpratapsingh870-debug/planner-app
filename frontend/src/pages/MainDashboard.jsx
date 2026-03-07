@@ -12,6 +12,7 @@ import GoalPlanner from '../components/GoalPlanner';
 import Analytics from '../components/Analytics';
 import AIAssistant from '../components/AIAssistant';
 import Settings from '../components/Settings';
+import Pricing from '../components/Pricing';
 import TaskModal from '../components/TaskModal';
 import RightRail from '../components/RightRail';
 import { fetchTasks, createTask, updateTask, deleteTask, fetchHabits, toggleHabitDay } from '../services/api';
@@ -105,6 +106,18 @@ export default function MainDashboard() {
     }
   };
 
+  // Bulk create tasks from AI
+  const handleBulkCreateTasks = async (tasksArray) => {
+    for (const taskData of tasksArray) {
+      try {
+        const newTask = await createTask(taskData);
+        setTasks(prev => [...prev, newTask]);
+      } catch (err) {
+        console.error('Failed to create AI task:', err);
+      }
+    }
+  };
+
   // View titles
   const viewTitles = {
     dashboard: 'Dashboard',
@@ -118,7 +131,8 @@ export default function MainDashboard() {
     calendar:  'Calendar',
     goals:     'Goal Planner',
     analytics: 'Analytics',
-    ai:        'AI Assistant',
+    ai:        'AI Autonomous Planner',
+    pricing:   'Pricing',
     settings:  'Settings',
   };
 
@@ -145,7 +159,8 @@ export default function MainDashboard() {
         <Route path="timeline" element={<Timeline tasks={tasks} onEditTask={handleOpenEdit} />} />
         <Route path="goals" element={<GoalPlanner tasks={tasks} />} />
         <Route path="analytics" element={<Analytics tasks={tasks} />} />
-        <Route path="ai" element={<AIAssistant />} />
+        <Route path="ai" element={<AIAssistant onCreateTasks={handleBulkCreateTasks} />} />
+        <Route path="pricing" element={<Pricing />} />
         <Route path="settings" element={<Settings />} />
         <Route path="exam" element={
           <ExamPlanner

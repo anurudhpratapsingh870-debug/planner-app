@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Calendar, ClipboardList, Target, 
   BarChart3, BrainCircuit, Settings, LogOut, Flame,
-  Briefcase, GraduationCap, Map, Moon, Sun
+  Briefcase, GraduationCap, Map, Moon, Sun, Crown
 } from 'lucide-react';
 
 export default function Sidebar({ activeView, onNavigate, taskCounts }) {
@@ -75,8 +75,9 @@ export default function Sidebar({ activeView, onNavigate, taskCounts }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
         <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px', paddingLeft: '8px' }}>Trackers & AI</div>
         <NavItem id="habits" label="Habits" icon={<Flame size={18} />} />
-        <NavItem id="ai" label="AI Assistant" icon={<BrainCircuit size={18} />} />
+        <NavItem id="ai" label="AI Planner" icon={<BrainCircuit size={18} />} />
         <NavItem id="analytics" label="Analytics" icon={<BarChart3 size={18} />} />
+        <NavItem id="pricing" label="Upgrade" icon={<Crown size={18} />} />
       </div>
 
       <div style={{ marginTop: 'auto', borderTop: '1px solid var(--border-color)', paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>

@@ -1121,3 +1121,9 @@ small, .caption { font-size: 0.875rem; line-height: 1.4; color: var(--text-secon
     grid-template-columns: 1fr;
   }
 }
+
+/* Spinner animation for AI loading */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
