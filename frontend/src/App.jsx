@@ -16,9 +16,7 @@ const ProtectedRoute = ({ children }) => {
       setLoading(false);
     });
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
 
@@ -31,14 +29,37 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+const PublicRoute = ({ children }) => {
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (loading) return null; // Prevent flicker
+  if (session) return <Navigate to="/app" replace />;
+  
+  return children;
+};
+
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<AuthPage mode="login" />} />
-        <Route path="/signup" element={<AuthPage mode="signup" />} />
+        <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
+        <Route path="/login" element={<PublicRoute><AuthPage mode="login" /></PublicRoute>} />
+        <Route path="/signup" element={<PublicRoute><AuthPage mode="signup" /></PublicRoute>} />
 
         {/* Protected App Routes */}
         <Route 
