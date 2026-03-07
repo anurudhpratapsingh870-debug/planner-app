@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BookOpen, FileUp, Sparkles, BrainCircuit, Calendar as CalIcon, Clock, MoreVertical, Plus, ChevronRight, CheckSquare, Circle } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { Capacitor } from '@capacitor/core';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 export default function ExamPlanner({ tasks, onToggleTask, onDeleteTask, onAddTask, onEditTask, onReorderTasks }) {
   const examTasks = tasks.filter(t => t.planner === 'exam');
@@ -19,6 +21,10 @@ export default function ExamPlanner({ tasks, onToggleTask, onDeleteTask, onAddTa
   };
 
   const onDragEnd = (result) => {
+    if (Capacitor.isNativePlatform()) {
+      Haptics.impact({ style: ImpactStyle.Medium });
+    }
+
     if (!result.destination) return;
     const items = Array.from(tasks);
     const affectedTasks = tasks.filter(t => t.planner === 'exam');
@@ -72,8 +78,12 @@ export default function ExamPlanner({ tasks, onToggleTask, onDeleteTask, onAddTa
               <Plus size={16} /> Track New Subject
             </button>
           </div>
-
-          <DragDropContext onDragEnd={onDragEnd}>
+          <DragDropContext 
+            onDragEnd={onDragEnd}
+            onDragStart={() => {
+              if (Capacitor.isNativePlatform()) Haptics.impact({ style: ImpactStyle.Light });
+            }}
+          >
             <Droppable droppableId="exam-list">
               {(provided) => (
                 <div {...provided.droppableProps} ref={provided.innerRef} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>

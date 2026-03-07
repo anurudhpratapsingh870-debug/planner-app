@@ -6,6 +6,8 @@ import MainDashboard from './pages/MainDashboard';
 import { supabase } from './lib/supabase';
 import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
+import { StatusBar, Style } from '@capacitor/status-bar';
+import { Keyboard } from '@capacitor/keyboard';
 import './index.css';
 
 class ErrorBoundary extends React.Component {
@@ -45,6 +47,20 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Native Mobile Configuration
+    if (Capacitor.isNativePlatform()) {
+      const initMobile = async () => {
+        try {
+          await StatusBar.setStyle({ style: Style.Light });
+          await StatusBar.setBackgroundColor({ color: '#ffffff' });
+          await Keyboard.setAccessoryBarVisible({ isVisible: false });
+        } catch (e) {
+          console.warn('Native plugins not fully active on web', e);
+        }
+      };
+      initMobile();
+    }
+
     // 1. Get initial session
     supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
       setSession(initialSession);

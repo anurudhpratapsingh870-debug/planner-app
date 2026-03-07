@@ -9,6 +9,9 @@ import {
   CheckSquare, Flame, BarChart3, TrendingUp, Zap
 } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { Capacitor } from '@capacitor/core';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
+
 
 const analyticsData = [
   { name: 'Mon', value: 3 },
@@ -30,11 +33,21 @@ export default function Dashboard({ tasks = [], onNavigate, onEditTask, onReorde
   const priorityTasks = tasks.slice(0, 5); // Just show top 5 for dashboard
 
   const onDragEnd = (result) => {
+    if (Capacitor.isNativePlatform()) {
+      Haptics.impact({ style: ImpactStyle.Medium });
+    }
+
     if (!result.destination) return;
     const items = Array.from(tasks);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
     onReorderTasks(items);
+  };
+
+  const onDragStart = () => {
+    if (Capacitor.isNativePlatform()) {
+      Haptics.impact({ style: ImpactStyle.Light });
+    }
   };
 
   return (
@@ -79,7 +92,10 @@ export default function Dashboard({ tasks = [], onNavigate, onEditTask, onReorde
             <span style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 500 }}>Drag to reorder</span>
           </div>
           
-          <DragDropContext onDragEnd={onDragEnd}>
+          <DragDropContext 
+            onDragEnd={onDragEnd}
+            onDragStart={onDragStart}
+          >
             <Droppable droppableId="tasks-list">
               {(provided) => (
                 <div {...provided.droppableProps} ref={provided.innerRef} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>

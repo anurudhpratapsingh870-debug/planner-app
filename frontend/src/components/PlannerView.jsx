@@ -2,6 +2,8 @@ import React from 'react';
 import { Plus, Clock, Flag, Circle, CheckCircle2, MoreHorizontal, Calendar as CalIcon, BookOpen, Briefcase, GraduationCap, Users, LayoutDashboard } from 'lucide-react';
 import { format } from 'date-fns';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { Capacitor } from '@capacitor/core';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 const plannerMeta = {
   school: { label: 'School Planner',  color: '#4f46e5', desc: 'Assignments & Classes', theme: 'indigo', icon: <GraduationCap size={28} /> },
@@ -20,6 +22,10 @@ export default function PlannerView({ type, tasks, onToggleTask, onDeleteTask, o
   const done = plannerTasks.filter(t => t.status === 'done');
 
   const onDragEnd = (result) => {
+    if (Capacitor.isNativePlatform()) {
+      Haptics.impact({ style: ImpactStyle.Medium });
+    }
+    
     if (!result.destination) return;
     const items = Array.from(tasks);
     const affectedTasks = tasks.filter(t => t.planner === type);
@@ -34,6 +40,12 @@ export default function PlannerView({ type, tasks, onToggleTask, onDeleteTask, o
       return t;
     });
     onReorderTasks(newTasks);
+  };
+
+  const onDragStart = () => {
+    if (Capacitor.isNativePlatform()) {
+      Haptics.impact({ style: ImpactStyle.Light });
+    }
   };
 
   const getPriorityColor = (p) => {

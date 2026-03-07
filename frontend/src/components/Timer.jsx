@@ -4,6 +4,9 @@ import {
   Settings, Volume2, VolumeX, Maximize2 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Capacitor } from '@capacitor/core';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
+
 
 export default function Timer({ isOpen, onClose, onFinish }) {
   const [mode, setMode] = useState('focus'); // 'focus', 'short_break', 'long_break'
@@ -35,6 +38,12 @@ export default function Timer({ isOpen, onClose, onFinish }) {
       const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
       audio.play();
     }
+    
+    // Vibrate heavily on completion if running natively
+    if (Capacitor.isNativePlatform()) {
+      Haptics.vibrate({ duration: 1000 }).catch(console.warn);
+    }
+    
     if (onFinish) onFinish({ mode, duration: configs[mode].time });
     alert(`${mode === 'focus' ? 'Focus session' : 'Break'} finished!`);
   };
