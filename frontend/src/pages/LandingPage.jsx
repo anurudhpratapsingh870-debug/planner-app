@@ -1,275 +1,268 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, CheckCircle2, Layout, Calendar as CalIcon, ArrowRight, Zap, Target, BarChart3 } from 'lucide-react';
+import { Sparkles, CheckCircle2, Layout, Calendar as CalIcon, ArrowRight, Zap, Target, BarChart3, Globe, Shield, Users, Smartphone } from 'lucide-react';
 
 export default function LandingPage() {
   const navigate = useNavigate();
-  const [isVisible, setIsVisible] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
-    setIsVisible(true);
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Scroll Fade-in logic using Intersection Observer
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.scroll-reveal').forEach(el => observer.observe(el));
+    return () => observer.disconnect();
   }, []);
 
   return (
     <div style={{ 
       minHeight: '100vh', 
       background: '#fff', 
-      color: '#1a1a1a', 
-      fontFamily: '"Outfit", "Inter", sans-serif',
+      color: '#202020', 
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"',
       overflowX: 'hidden'
     }}>
       
-      {/* Dynamic Background Accents */}
-      <div style={{ 
-        position: 'fixed', top: '-10%', right: '-5%', width: '40vw', height: '40vw', 
-        background: 'radial-gradient(circle, rgba(255,107,95,0.08) 0%, rgba(255,255,255,0) 70%)',
-        zIndex: 0, pointerEvents: 'none' 
-      }}></div>
-      <div style={{ 
-        position: 'fixed', bottom: '-10%', left: '-5%', width: '30vw', height: '30vw', 
-        background: 'radial-gradient(circle, rgba(67,97,238,0.05) 0%, rgba(255,255,255,0) 70%)',
-        zIndex: 0, pointerEvents: 'none' 
-      }}></div>
-
-      {/* Injecting CSS Animations */}
       <style>{`
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(30px); }
-          to { opacity: 1; transform: translateY(0); }
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
         }
         @keyframes float {
-          0% { transform: translateY(0px); }
-          50% { transform: translateY(-15px); }
-          100% { transform: translateY(0px); }
+          0% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-10px) rotate(1deg); }
+          100% { transform: translateY(0px) rotate(0deg); }
         }
-        @keyframes shine {
-          0% { left: -100%; }
-          20% { left: 100%; }
-          100% { left: 100%; }
+        .scroll-reveal {
+          opacity: 0;
+          transform: translateY(30px);
+          transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
-        .fade-in { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
-        .float { animation: float 6s ease-in-out infinite; }
-        .btn-shine { position: relative; overflow: hidden; }
-        .btn-shine::after {
-          content: '';
-          position: absolute;
-          top: -50%; left: -100%; width: 100%; height: 200%;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-          transform: rotate(35deg);
-          animation: shine 4s infinite;
+        .scroll-reveal.visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        .wavy-bg {
+          background: linear-gradient(180deg, rgba(255,107,95,0.03) 0%, rgba(255,255,255,0) 100%);
+          border-radius: 50% 50% 0 0 / 10% 10% 0 0;
+        }
+        .btn-hover:hover {
+          filter: brightness(0.9);
+          transform: scale(1.02);
         }
       `}</style>
 
-      {/* Top Navbar */}
+      {/* Navigation */}
       <nav style={{ 
-        display: 'flex', justifyContent: 'space-between', padding: '24px 40px', alignItems: 'center', 
-        maxWidth: 1300, margin: '0 auto', position: 'relative', zIndex: 10 
+        display: 'flex', justifyContent: 'space-between', padding: '12px 40px', alignItems: 'center', 
+        maxWidth: 1400, margin: '0 auto', background: scrollY > 20 ? 'rgba(255,255,255,0.9)' : 'transparent',
+        backdropFilter: scrollY > 20 ? 'blur(10px)' : 'none',
+        position: 'sticky', top: 0, zIndex: 1000, transition: 'all 0.3s'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }} onClick={() => navigate('/')}>
-          <div style={{ 
-            background: 'linear-gradient(135deg, #FF6B5F 0%, #E44332 100%)', 
-            padding: '8px', borderRadius: '10px', color: '#fff',
-            boxShadow: '0 4px 12px rgba(228, 67, 50, 0.2)'
-          }}>
-            <Layout size={24} strokeWidth={2.5} />
-          </div>
-          <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.8px', color: '#1a1a1a' }}>Antigravity<span style={{color: '#E44332'}}>Planner</span></span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={() => navigate('/')}>
+          <div style={{ color: '#E44332' }}><Layout size={28} strokeWidth={3} /></div>
+          <span style={{ fontSize: 20, fontWeight: 800, color: '#E44332' }}>Life Planner</span>
         </div>
         
         <div style={{ display: 'flex', gap: '32px', alignItems: 'center' }}>
-          <div style={{ display: 'none', lg: 'flex', gap: '28px', fontSize: 15, fontWeight: 600, color: '#666' }}>
-            <span style={{ cursor: 'pointer', transition: '0.2s color' }}>Features</span>
-            <span style={{ cursor: 'pointer' }}>Pricing</span>
-            <span style={{ cursor: 'pointer' }}>Showcase</span>
+          <div style={{ display: 'flex', gap: '24px', fontSize: 15, fontWeight: 500, color: '#666' }}>
+            <span>Features</span>
+            <span>For Teams</span>
+            <span>Resources</span>
+            <span>Pricing</span>
           </div>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <button 
-              onClick={() => navigate('/login')}
-              style={{ background: 'transparent', border: 'none', padding: '10px 20px', fontSize: 15, fontWeight: 600, cursor: 'pointer', color: '#1a1a1a' }}
-            >
-              Log in
-            </button>
+          <div style={{ width: '1px', height: '24px', background: '#e5e5e5' }}></div>
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+            <span style={{ cursor: 'pointer', fontSize: 15, fontWeight: 500 }} onClick={() => navigate('/login')}>Log in</span>
             <button 
               onClick={() => navigate('/signup')}
-              className="btn btn-shine"
-              style={{ 
-                background: '#1a1a1a', color: '#fff', border: 'none', padding: '12px 24px', 
-                borderRadius: '12px', fontSize: 15, fontWeight: 700, cursor: 'pointer',
-                transition: 'transform 0.2s', boxShadow: '0 8px 20px rgba(0,0,0,0.1)'
-              }}
-              onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+              className="btn-hover"
+              style={{ background: '#E44332', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '5px', fontSize: 13, fontWeight: 700, cursor: 'pointer', transition: '0.2s' }}
             >
-              Get Started — Free
+              Start for free
             </button>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <main style={{ maxWidth: 1200, margin: '0 auto', padding: '100px 24px', textAlign: 'center', position: 'relative', zIndex: 1 }}>
-        <div className="fade-in" style={{ animationDelay: '0.1s' }}>
-          <span style={{ 
-            display: 'inline-flex', alignItems: 'center', gap: '8px', 
-            padding: '8px 16px', background: 'rgba(228,67,50,0.08)', 
-            borderRadius: '100px', color: '#E44332', fontSize: '13px', 
-            fontWeight: 700, marginBottom: '24px', letterSpacing: '0.5px' 
+      {/* Hero Section - Left Aligned Text, Right Aligned App Preview */}
+      <section style={{ 
+        maxWidth: 1200, margin: '0 auto', padding: '120px 40px 80px', 
+        display: 'flex', alignItems: 'center', gap: '60px', flexWrap: 'wrap' 
+      }}>
+        <div style={{ flex: '1 1 500px' }}>
+          <h1 style={{ 
+            fontSize: 'clamp(48px, 6vw, 76px)', fontWeight: 800, lineHeight: 1.05, 
+            letterSpacing: '-0.04em', margin: '0 0 24px', color: '#1a1a1a' 
           }}>
-            <Sparkles size={14} /> NEW: AI-POWERED PRODUCTIVITY TOOLS
-          </span>
-        </div>
-
-        <h1 className="fade-in" style={{ 
-          fontSize: 'clamp(48px, 8vw, 84px)', fontWeight: 900, letterSpacing: '-0.04em', 
-          marginBottom: 24, lineHeight: 0.95, color: '#1a1a1a', animationDelay: '0.2s' 
-        }}>
-          One tool for <br />
-          <span style={{ 
-            background: 'linear-gradient(90deg, #FF6B5F, #E44332)', 
-            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' 
-          }}>pure productivity.</span>
-        </h1>
-
-        <p className="fade-in" style={{ 
-          fontSize: 'clamp(18px, 2vw, 22px)', color: '#666', maxWidth: 700, 
-          margin: '0 auto 48px', lineHeight: 1.5, fontWeight: 500, animationDelay: '0.3s' 
-        }}>
-          The ultimate workspace for your life. Break down goals, track habits, 
-          and manage your timeline with a professional dashboard designed for high-performance minds.
-        </p>
-
-        <div className="fade-in" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '20px', animationDelay: '0.4s' }}>
+            Clarity, finally.
+          </h1>
+          <p style={{ fontSize: 22, color: '#555', marginBottom: 40, lineHeight: 1.5, maxWidth: 500 }}>
+            Simplify life for both you and your goals. The world’s #1 task manager and to-do list app.
+          </p>
           <button 
             onClick={() => navigate('/signup')}
-            className="btn-shine"
+            className="btn-hover"
             style={{ 
-              background: '#E44332', color: '#fff', border: 'none', padding: '20px 48px', 
-              borderRadius: '16px', fontSize: 18, fontWeight: 800, cursor: 'pointer',
-              boxShadow: '0 20px 40px rgba(228, 67, 50, 0.25)', transition: 'all 0.3s'
+              background: '#E44332', color: '#fff', border: 'none', padding: '14px 28px', 
+              borderRadius: '8px', fontSize: 18, fontWeight: 700, cursor: 'pointer', transition: '0.2s'
             }}
           >
-            Create Your Planner 
+            Start for free
           </button>
-          <button 
-            style={{ 
-              background: '#fff', color: '#1a1a1a', border: '2px solid #f0f0f0', padding: '20px 32px', 
-              borderRadius: '16px', fontSize: 18, fontWeight: 700, cursor: 'pointer',
-              transition: 'all 0.3s', display: 'flex', alignItems: 'center', gap: '12px'
-            }}
-            onMouseEnter={(e) => e.target.style.background = '#fafafa'}
-            onMouseLeave={(e) => e.target.style.background = '#fff'}
-          >
-            Watch Demo <ArrowRight size={20} />
-          </button>
+          <p style={{ marginTop: 20, fontSize: 14, color: '#999' }}>Available on Web, iOS, and Android.</p>
         </div>
-
-        {/* Professional UI Mockup (Premium CSS-based) */}
-        <div className="fade-in float" style={{ marginTop: 100, position: 'relative', animationDelay: '0.6s' }}>
+        
+        {/* Hero Illustration Mockup */}
+        <div style={{ flex: '1 1 500px', position: 'relative' }}>
           <div style={{ 
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.8), rgba(240,240,240,0.5))', 
-            backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.8)', 
-            borderRadius: '32px', padding: '16px', 
-            boxShadow: '0 40px 100px rgba(0,0,0,0.12)', 
-            display: 'inline-block', width: '100%', maxWidth: '1000px',
-            position: 'relative'
+            background: 'rgba(255,107,95,0.05)', borderRadius: '30px', padding: '40px',
+            boxShadow: '0 40px 80px rgba(0,0,0,0.05)', animation: 'float 8s ease-in-out infinite' 
           }}>
-            {/* Toolbar mockup */}
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', padding: '0 8px' }}>
-                <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#ff5f57' }}></div>
-                <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#ffbd2e' }}></div>
-                <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#27c93f' }}></div>
+            <img 
+              src="https://images.unsplash.com/photo-1611224885990-ab7363d1f2a9?auto=format&fit=crop&q=80&w=1000" 
+              alt="UI Preview" 
+              style={{ width: '100%', borderRadius: '15px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }} 
+            />
+          </div>
+          {/* Floating Mobile Mockup */}
+          <div style={{ 
+            position: 'absolute', bottom: '-40px', right: '-20px', width: '240px',
+            background: '#fff', borderRadius: '24px', padding: '10px',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.15)', animation: 'float 6s ease-in-out infinite reverse'
+          }}>
+             <img 
+              src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=400" 
+              alt="Mobile" 
+              style={{ width: '100%', borderRadius: '18px' }} 
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Wavy Feature Ribbon (The "Carousel") */}
+      <div style={{ 
+        margin: '100px 0', overflow: 'hidden', padding: '40px 0',
+        background: 'linear-gradient(5deg, rgba(255,255,255,1) 0%, rgba(255,107,95,0.03) 50%, rgba(255,255,255,1) 100%)',
+        position: 'relative'
+      }}>
+        <div style={{ 
+          display: 'flex', width: '200%', animation: 'marquee 30s linear infinite',
+          fontSize: '18px', fontWeight: 600, color: '#e44332', gap: '80px', opacity: 0.6
+        }}>
+          {[1,2,3,4,5,6].map(i => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+              <CheckCircle2 size={24} /> <span>30 Million+ Users Trust Us</span>
+              <Sparkles size={24} /> <span>Built for Peak Performance</span>
+              <Globe size={24} /> <span>Local to Global Sync</span>
             </div>
-            
-            <div style={{ 
-              background: '#fff', borderRadius: '20px', display: 'flex', 
-              height: 550, overflow: 'hidden', textAlign: 'left',
-              boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.02)' 
-            }}>
-              {/* Sidebar Mockup */}
-              <div style={{ width: '220px', background: '#f8f9fa', padding: '24px', borderRight: '1px solid #f0f0f0' }}>
-                <div style={{ width: '100%', height: 32, background: '#eee', borderRadius: 8, marginBottom: 32 }}></div>
-                {[60, 80, 70, 90, 65].map((w, i) => (
-                    <div key={i} style={{ width: `${w}%`, height: 10, background: '#f0f0f0', borderRadius: 4, marginBottom: 20 }}></div>
-                ))}
-              </div>
-              {/* Content Mockup */}
-              <div style={{ flex: 1, padding: '40px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '40px' }}>
-                    <div style={{ width: '40%', height: 32, background: '#f0f0f0', borderRadius: 8 }}></div>
-                    <div style={{ width: '100px', height: 32, background: '#E44332', borderRadius: 8, opacity: 0.1 }}></div>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-                    <div style={{ background: '#fafafa', height: 200, borderRadius: 16, border: '1px solid #f0f0f0', padding: 20 }}>
-                        <div style={{ display: 'flex', gap: 10, marginBottom: 15 }}>
-                            <Zap size={18} color="#E44332" /> <div style={{ width: 80, height: 10, background: '#eee', borderRadius: 5, marginTop: 4 }}></div>
-                        </div>
-                        <div style={{ width: '100%', height: 10, background: '#eee', borderRadius: 5, marginBottom: 10 }}></div>
-                        <div style={{ width: '80%', height: 10, background: '#eee', borderRadius: 5, marginBottom: 10 }}></div>
-                    </div>
-                    <div style={{ background: '#fafafa', height: 200, borderRadius: 16, border: '1px solid #f0f0f0', padding: 20 }}>
-                        <div style={{ display: 'flex', gap: 10, marginBottom: 15 }}>
-                            <BarChart3 size={18} color="#4361EE" /> <div style={{ width: 80, height: 10, background: '#eee', borderRadius: 5, marginTop: 4 }}></div>
-                        </div>
-                        <div style={{ width: '100%', height: 10, background: '#eee', borderRadius: 5, marginBottom: 10 }}></div>
-                        <div style={{ width: '60%', height: 10, background: '#eee', borderRadius: 5, marginBottom: 10 }}></div>
-                    </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Floating Badges */}
-            <div style={{ 
-                position: 'absolute', top: '-20px', right: '-30px', background: '#fff', 
-                padding: '16px 24px', borderRadius: '16px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
-                display: 'flex', alignItems: 'center', gap: '12px', fontWeight: 700 
-            }}>
-                <CheckCircle2 color="#27c93f" /> <span>Done: Exam Prep</span>
-            </div>
-            <div style={{ 
-                position: 'absolute', bottom: '40px', left: '-50px', background: '#FF6B5F', color: '#fff',
-                padding: '16px', borderRadius: '50%', boxShadow: '0 20px 40px rgba(228,67,50,0.3)',
-                width: 64, height: 64, display: 'flex', alignItems: 'center', justifyContent: 'center' 
-            }}>
-                <Sparkles />
-            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Alternating Feature Sections */}
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px' }}>
+        
+        {/* Section 1: Capture */}
+        <div className="scroll-reveal" style={{ display: 'flex', alignItems: 'center', gap: '100px', marginBottom: '150px', flexWrap: 'wrap-reverse' }}>
+          <div style={{ flex: '1 1 450px' }}>
+            <img 
+              src="https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&q=80&w=800" 
+              alt="Feature 1" 
+              style={{ width: '100%', borderRadius: '20px', boxShadow: '0 20px 40px rgba(0,0,0,0.05)' }} 
+            />
+          </div>
+          <div style={{ flex: '1 1 450px' }}>
+            <h4 style={{ color: '#E44332', fontSize: 13, fontWeight: 700, textTransform: 'uppercase', marginBottom: 12 }}>Workflow</h4>
+            <h2 style={{ fontSize: 40, fontWeight: 800, marginBottom: 24, lineHeight: 1.1 }}>Capture tasks at the speed of thought</h2>
+            <p style={{ fontSize: 18, color: '#666', lineHeight: 1.6 }}>
+              Capture and organize tasks the moment they pop into your head. 
+              Use powerful natural language processing to set smart deadlines and reminders instantly.
+            </p>
           </div>
         </div>
 
-        {/* Features Minimalist */}
-        <div style={{ marginTop: 150, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '48px', padding: '0 24px' }}>
-            <div className="fade-in" style={{ animationDelay: '0.7s', textAlign: 'left' }}>
-                <div style={{ color: '#E44332', marginBottom: 16 }}><Target size={32} /></div>
-                <h3 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>Precision Planning</h3>
-                <p style={{ color: '#666', lineHeight: 1.6 }}>Define macro-goals and watch them get sliced into manageable daily habits automatically.</p>
-            </div>
-            <div className="fade-in" style={{ animationDelay: '0.8s', textAlign: 'left' }}>
-                <div style={{ color: '#4361EE', marginBottom: 16 }}><BarChart3 size={32} /></div>
-                <h3 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>Deep Analytics</h3>
-                <p style={{ color: '#666', lineHeight: 1.6 }}>Understand where your time goes with beautiful, interactive charts and focus metrics.</p>
-            </div>
-            <div className="fade-in" style={{ animationDelay: '0.9s', textAlign: 'left' }}>
-                <div style={{ color: '#FFBD2E', marginBottom: 16 }}><Zap size={32} /></div>
-                <h3 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>Sync Anywhere</h3>
-                <p style={{ color: '#666', lineHeight: 1.6 }}>Your life doesn't stop. Access your planner on any device with instant cloud synchronization.</p>
-            </div>
+        {/* Section 2: Organize */}
+        <div className="scroll-reveal" style={{ display: 'flex', alignItems: 'center', gap: '100px', marginBottom: '150px', flexWrap: 'wrap' }}>
+          <div style={{ flex: '1 1 450px' }}>
+            <h4 style={{ color: '#E44332', fontSize: 13, fontWeight: 700, textTransform: 'uppercase', marginBottom: 12 }}>Organization</h4>
+            <h2 style={{ fontSize: 40, fontWeight: 800, marginBottom: 24, lineHeight: 1.1 }}>Stay organized and focused</h2>
+            <p style={{ fontSize: 18, color: '#666', lineHeight: 1.6 }}>
+              Group your tasks into projects, tags, and sections. 
+              Stay on top of your priorities with custom filters and smart views that show only what you need.
+            </p>
+          </div>
+          <div style={{ flex: '1 1 450px', background: 'rgba(67,97,238,0.03)', borderRadius: '30px', padding: '30px' }}>
+             <img 
+              src="https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&q=80&w=800" 
+              alt="Feature 2" 
+              style={{ width: '100%', borderRadius: '20px', boxShadow: '0 20px 40px rgba(0,0,0,0.05)' }} 
+            />
+          </div>
         </div>
 
-        {/* Git Timing Tip Section */}
-        <div className="fade-in" style={{ 
-            marginTop: 150, padding: 40, background: '#f8f9fa', borderRadius: 32, 
-            textAlign: 'left', border: '1px solid #f0f0f0', animationDelay: '1s' 
-        }}>
-            <h4 style={{ fontSize: 20, fontWeight: 700, marginBottom: 16 }}>Developer Insights</h4>
-            <p style={{ color: '#666', marginBottom: 24 }}>You can monitor your <b>git push</b> health by checking the terminal output. Want to see exactly how long it takes? Try this command:</p>
-            <code style={{ background: '#1a1a1a', color: '#fff', padding: '12px 20px', borderRadius: '12px', display: 'block', fontSize: 14 }}>
-               Measure-Command { "{" } git push { "}" }
-            </code>
-            <p style={{ marginTop: 24, fontSize: 13, color: '#999' }}>* This works on Windows PowerShell. It will show you exactly how many seconds your push takes from start to finish.</p>
-        </div>
-      </main>
+      </div>
 
-      <footer style={{ borderTop: '1px solid #f0f0f0', padding: '60px 24px', textAlign: 'center', marginTop: 100 }}>
-          <p style={{ color: '#999', fontSize: 14 }}>© 2026 Antigravity Planner. All rights reserved.</p>
+      {/* Footer / CTA Section */}
+      <section style={{ 
+        background: 'linear-gradient(180deg, #fff 0%, #E4433205 100%)', 
+        padding: '120px 40px', textAlign: 'center' 
+      }}>
+        <div className="scroll-reveal">
+          <h2 style={{ fontSize: 48, fontWeight: 800, marginBottom: 24 }}>Ready to gain clarity?</h2>
+          <button 
+            onClick={() => navigate('/signup')}
+            className="btn-hover"
+            style={{ 
+              background: '#E44332', color: '#fff', border: 'none', padding: '16px 36px', 
+              borderRadius: '8px', fontSize: 18, fontWeight: 700, cursor: 'pointer', transition: '0.2s'
+            }}
+          >
+            Get Started Now — It's Free
+          </button>
+          <div style={{ marginTop: 60, display: 'flex', justifyContent: 'center', gap: '60px', borderTop: '1px solid #eee', paddingTop: '60px' }}>
+             <div style={{ textAlign: 'left' }}>
+                <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 20 }}>Features</div>
+                <div style={{ fontSize: 14, color: '#666', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <span>How it works</span>
+                  <span>Templates</span>
+                  <span>Integrations</span>
+                </div>
+             </div>
+             <div style={{ textAlign: 'left' }}>
+                <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 20 }}>Company</div>
+                <div style={{ fontSize: 14, color: '#666', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <span>About Us</span>
+                  <span>Careers</span>
+                  <span>Blog</span>
+                </div>
+             </div>
+             <div style={{ textAlign: 'left' }}>
+                <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 20 }}>Social</div>
+                <div style={{ fontSize: 14, color: '#666', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <span>Twitter</span>
+                  <span>Instagram</span>
+                  <span>Community</span>
+                </div>
+             </div>
+          </div>
+        </div>
+      </section>
+
+      <footer style={{ padding: '40px', textAlign: 'center', fontSize: 12, color: '#999', borderTop: '1px solid #f9f9f9' }}>
+        © 2026 Life Planner. All rights reserved. Built with precision.
       </footer>
     </div>
   );
