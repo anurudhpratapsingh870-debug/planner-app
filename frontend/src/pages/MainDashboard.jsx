@@ -21,7 +21,7 @@ import {
   fetchHabits, toggleHabitDay, updateTaskPositions, saveTimerLog
 } from '../services/api';
 import { 
-  Search, Bell, User, Plus
+  Search, Bell, User, Plus, Clock
 } from 'lucide-react';
 
 export default function MainDashboard() {

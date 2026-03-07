@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { 
-  LayoutDashboard, Calendar, Map, Target, 
+  LayoutDashboard, Calendar, Clock, Map, Target, 
   CheckSquare, Flame, BarChart3, BrainCircuit,
   Settings, LogOut, Moon, Sun, Crown, HelpCircle,
   Briefcase, GraduationCap, ClipboardList
