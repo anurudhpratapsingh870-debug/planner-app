@@ -1,246 +1,282 @@
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
-import { Clock, CheckCircle2, AlertCircle, LayoutDashboard, Calendar as CalendarIcon, MoreHorizontal } from 'lucide-react';
-import { format, startOfDay, endOfDay, differenceInHours, addHours } from 'date-fns';
+import { Clock, CheckCircle2, AlertCircle, LayoutDashboard, Calendar as CalendarIcon, MoreHorizontal, Zap, Target, BrainCircuit, ArrowRight, TrendingUp, Star } from 'lucide-react';
+import { format } from 'date-fns';
 
 const plannerMeta = {
-  school: { label: 'School Project', color: 'var(--accent-indigo)', bg: 'var(--bg-blue-light)' },
-  ug:     { label: 'UG Research', color: 'var(--accent-purple)', bg: 'var(--bg-purple-light)' },
-  exam:   { label: 'Exam Prep', color: 'var(--accent-red)', bg: 'var(--bg-red-light)' },
-  daily:  { label: 'Daily Tasks', color: 'var(--accent-orange)', bg: 'var(--bg-orange-light)' },
-  office: { label: 'Office/Work', color: 'var(--accent-green)', bg: 'var(--bg-green-light)' },
+  school: { label: 'School',   color: '#6366f1', bg: '#eef2ff', lightBg: '#e0e7ff' },
+  ug:     { label: 'UG',       color: '#8b5cf6', bg: '#f5f3ff', lightBg: '#ede9fe' },
+  exam:   { label: 'Exams',    color: '#ef4444', bg: '#fef2f2', lightBg: '#fee2e2' },
+  daily:  { label: 'Daily',    color: '#f59e0b', bg: '#fffbeb', lightBg: '#fef3c7' },
+  office: { label: 'Office',   color: '#10b981', bg: '#ecfdf5', lightBg: '#d1fae5' },
 };
 
 export default function Dashboard({ tasks, onNavigate, onEditTask }) {
-  // --- Derived Statistics ---
-  const totalTasks = tasks.length;
-  const completedTasks = tasks.filter(t => t.status === 'done').length;
-  const inProgressTasks = tasks.filter(t => t.status === 'in_progress').length;
-  const incompleteTasks = totalTasks - completedTasks - inProgressTasks;
-  const urgentTasks = tasks.filter(t => t.priority === 'high' && t.status !== 'done').length;
+  // Derived statistics
+  const totalTasks       = tasks.length;
+  const completedTasks   = tasks.filter(t => t.status === 'done').length;
+  const inProgressTasks  = tasks.filter(t => t.status === 'in_progress').length;
+  const incompleteTasks  = totalTasks - completedTasks - inProgressTasks;
+  const urgentTasks      = tasks.filter(t => t.priority === 'high' && t.status !== 'done').length;
+  const completionRate   = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
-  // --- Mock Project Status Data (Grouped by Planner) ---
   const projectStats = Object.keys(plannerMeta).map(key => {
     const plannerTasks = tasks.filter(t => t.planner === key);
     const total = plannerTasks.length;
     const completed = plannerTasks.filter(t => t.status === 'done').length;
     const progress = total === 0 ? 0 : Math.round((completed / total) * 100);
-    return {
-      key,
-      ...plannerMeta[key],
-      progress,
-      total,
-      completed
-    };
+    return { key, ...plannerMeta[key], progress, total, completed };
   }).filter(p => p.total > 0);
 
-  // --- Gantt Chart Timeline Calculation ---
-  // We'll map tasks onto a 10-hour day from 07:00 to 17:00 for the visualization
   const timelineStartHour = 7;
-  const timelineEndHour = 17;
-  const totalHours = timelineEndHour - timelineStartHour;
-
-  // Helper to place mock timeline bars based on index to simulate a Gantt chart layout
+  const totalHours = 10;
   const activeTimelineTasks = tasks.filter(t => t.status !== 'done').slice(0, 4);
 
+  const today = format(new Date(), 'EEEE, do MMMM yyyy');
+
   return (
-    <div className="page-content" style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '1200px', margin: '0 auto', paddingBottom: '40px' }}>
-      
-      {/* --- Top Section: Header --- */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <h1 style={{ fontSize: '28px', fontWeight: 700, letterSpacing: '-0.5px', color: 'var(--text-primary)', marginBottom: '4px' }}>Task Overview</h1>
-          <p style={{ fontSize: '15px', color: 'var(--text-secondary)' }}>Welcome back. Here is your system status.</p>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-          {/* Professional Status / Teams (Initials instead of playful cartoons) */}
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            {['SJ', 'MD', 'AR', 'KL'].map((initials, i) => (
-               <div 
-                 key={initials} 
-                 style={{ width: '36px', height: '36px', borderRadius: '50%', border: '2px solid var(--bg-primary)', marginLeft: i > 0 ? '-12px' : '0', background: 'var(--bg-secondary)', zIndex: 10 - i, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', boxShadow: 'var(--shadow-sm)' }}
-                 title={`Team Member: ${initials}`}
-               >
-                 {initials}
-               </div>
-            ))}
-            <div style={{ width: '36px', height: '36px', borderRadius: '50%', border: '2px solid var(--bg-primary)', marginLeft: '-12px', background: 'var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', zIndex: 0, boxShadow: 'var(--shadow-sm)' }}>
-              +3
-            </div>
+    <div className="page-content" style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1200px', margin: '0 auto', paddingBottom: '40px' }}>
+
+      {/* ===== HERO BANNER (Reference-matched blue gradient) ===== */}
+      <div style={{
+        borderRadius: '24px',
+        background: 'linear-gradient(130deg, #3730a3 0%, #4f46e5 40%, #6366f1 70%, #818cf8 100%)',
+        padding: '0',
+        overflow: 'hidden',
+        boxShadow: '0 20px 60px rgba(79, 70, 229, 0.3)',
+        position: 'relative',
+        minHeight: '220px',
+        display: 'flex',
+        alignItems: 'stretch'
+      }}>
+        {/* Decorative circles */}
+        <div style={{ position: 'absolute', top: '-40px', right: '200px', width: '200px', height: '200px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: '-60px', left: '60px', width: '180px', height: '180px', borderRadius: '50%', background: 'rgba(255,255,255,0.04)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: '20px', right: '300px', width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(255,255,255,0.06)', pointerEvents: 'none' }} />
+
+        {/* Left content */}
+        <div style={{ flex: 1, padding: '40px 40px 40px 48px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)', borderRadius: '20px', padding: '4px 12px', marginBottom: '16px', width: 'fit-content' }}>
+            <Star size={12} fill="#fbbf24" stroke="none" />
+            <span style={{ fontSize: '12px', fontWeight: 700, color: '#fde68a' }}>Life OS — Your Personal HQ</span>
           </div>
-
-          <div style={{ height: '24px', width: '1px', background: 'var(--border-color)' }}></div>
-
-          <div style={{ padding: '8px 16px', background: 'var(--bg-primary)', borderRadius: '24px', border: '1px solid var(--border-color)', fontSize: '14px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <CalendarIcon size={16} />
-            {format(new Date(), 'do MMMM yyyy')}
+          <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#fff', letterSpacing: '-1px', marginBottom: '10px', lineHeight: 1.2 }}>
+            Plan the life that<br />works for <span style={{ color: '#fde68a' }}>you</span>
+          </h1>
+          <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.8)', marginBottom: '24px', maxWidth: '380px', lineHeight: 1.6 }}>
+            AI-powered planning, habit tracking, goal management, and financial planning — all in one workspace.
+          </p>
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => onNavigate('ai')}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px', borderRadius: '12px', border: 'none', background: '#fbbf24', color: '#1e293b', fontWeight: 700, fontSize: '14px', cursor: 'pointer', boxShadow: '0 4px 14px rgba(251, 191, 36, 0.4)', transition: 'transform 0.2s' }}
+            >
+              <BrainCircuit size={16} /> Generate AI Plan
+            </button>
+            <button
+              onClick={() => onNavigate('goals')}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.3)', background: 'rgba(255,255,255,0.1)', color: '#fff', fontWeight: 600, fontSize: '14px', cursor: 'pointer', backdropFilter: 'blur(8px)', transition: 'all 0.2s' }}
+            >
+              Set Goals <ArrowRight size={14} />
+            </button>
           </div>
         </div>
-      </div>
 
-      {/* --- Row 1: Project Timeline (Gantt) --- */}
-      <div style={{ background: 'var(--bg-primary)', borderRadius: '20px', border: '1px solid var(--border-color)', padding: '24px', boxShadow: 'var(--shadow-sm)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
-          <h3 style={{ fontSize: '18px', fontWeight: 700 }}>Project Timeline</h3>
-          <span style={{ fontSize: '13px', color: 'var(--text-secondary)', background: 'var(--bg-secondary)', padding: '4px 12px', borderRadius: '12px' }}>Today</span>
-        </div>
-
-        {/* Timeline Header (Hours) */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px', marginBottom: '20px', position: 'relative' }}>
-          {Array.from({ length: totalHours + 1 }).map((_, i) => (
-            <div key={i} style={{ fontSize: '12px', color: 'var(--text-secondary)', width: '40px', textAlign: 'center' }}>
-              {`${(timelineStartHour + i).toString().padStart(2, '0')}:00`}
+        {/* Right: floating stat cards (reference floating UI cards) */}
+        <div style={{ width: '340px', padding: '28px 40px 28px 0', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '12px' }}>
+          {[
+            { label: 'Tasks Completed', value: `${completedTasks}/${totalTasks}`, sub: `${completionRate}% done`, icon: <CheckCircle2 size={16} />, accent: '#4ade80' },
+            { label: 'Urgent Items', value: urgentTasks.toString(), sub: 'Needs attention', icon: <AlertCircle size={16} />, accent: '#fb923c' },
+            { label: today, value: '', sub: 'Today', icon: <CalendarIcon size={16} />, accent: '#a78bfa', isDate: true },
+          ].map((card, i) => (
+            <div key={i} style={{
+              background: 'rgba(255,255,255,0.12)',
+              backdropFilter: 'blur(12px)',
+              borderRadius: '14px',
+              padding: '12px 16px',
+              border: '1px solid rgba(255,255,255,0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+            }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: card.accent, flexShrink: 0 }}>
+                {card.icon}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: card.isDate ? '11px' : '16px', fontWeight: card.isDate ? 600 : 700, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {card.isDate ? card.label : card.value}
+                </div>
+                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>{card.sub}</div>
+              </div>
             </div>
           ))}
-          {/* Vertical Grid Lines */}
-          <div style={{ position: 'absolute', top: '30px', left: '20px', right: '20px', height: `${activeTimelineTasks.length * 50}px`, pointerEvents: 'none', display: 'flex', justifyContent: 'space-between' }}>
-             {Array.from({ length: totalHours + 1 }).map((_, i) => (
-                <div key={i} style={{ borderLeft: '1px dashed var(--border-color)', height: '100%' }}></div>
-             ))}
-          </div>
         </div>
+      </div>
 
-        {/* Timeline Bars */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', position: 'relative' }}>
-          {activeTimelineTasks.length > 0 ? activeTimelineTasks.map((task, index) => {
-            // Mock placement logic for stunning visual effect
-            const startHourOffset = (index * 1.5) % (totalHours - 2); 
-            const durationHours = 2 + (index % 2);
-            const leftPercent = (startHourOffset / totalHours) * 100;
-            const widthPercent = (durationHours / totalHours) * 100;
-            const meta = plannerMeta[task.planner] || plannerMeta.daily;
+      {/* ===== STAT CARDS ROW ===== */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+        {[
+          { label: 'Total Tasks',   value: totalTasks,       icon: <LayoutDashboard size={20} />, color: '#6366f1', bg: '#eef2ff' },
+          { label: 'In Progress',   value: inProgressTasks,  icon: <Clock size={20} />,           color: '#f59e0b', bg: '#fffbeb' },
+          { label: 'Completed',     value: completedTasks,   icon: <CheckCircle2 size={20} />,    color: '#10b981', bg: '#ecfdf5' },
+          { label: 'Urgent',        value: urgentTasks,      icon: <AlertCircle size={20} />,     color: '#ef4444', bg: '#fef2f2' },
+        ].map((stat, i) => (
+          <div key={i} style={{ background: '#fff', borderRadius: '16px', padding: '20px', border: '1px solid #f1f5f9', boxShadow: '0 2px 8px rgba(30,41,59,0.04)', display: 'flex', alignItems: 'center', gap: '14px', transition: 'transform 0.2s, box-shadow 0.2s', cursor: 'default' }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: stat.bg, color: stat.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: `0 4px 12px ${stat.color}20` }}>
+              {stat.icon}
+            </div>
+            <div>
+              <div style={{ fontSize: '24px', fontWeight: 800, color: '#1e293b', letterSpacing: '-0.5px' }}>{stat.value}</div>
+              <div style={{ fontSize: '13px', fontWeight: 500, color: '#64748b' }}>{stat.label}</div>
+            </div>
+          </div>
+        ))}
+      </div>
 
-            return (
-              <div 
-                key={task.id} 
-                className="hover-lift"
-                onClick={() => onEditTask && onEditTask(task)}
-                style={{ height: '36px', background: meta.bg, borderRadius: '18px', width: `${widthPercent}%`, marginLeft: `${leftPercent}%`, display: 'flex', alignItems: 'center', padding: '0 12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', position: 'relative', zIndex: 1, cursor: 'pointer', transition: 'transform 0.2s' }}
-              >
-                <div style={{ background: meta.color, width: '8px', height: '8px', borderRadius: '50%', marginRight: '8px' }}></div>
-                <span style={{ fontSize: '13px', fontWeight: 600, color: meta.color, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{task.title}</span>
+      {/* ===== FEATURE CARDS (What you can do — reference "What you can do?" section) ===== */}
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+          <h2 style={{ fontSize: '22px', fontWeight: 700, color: '#1e293b', letterSpacing: '-0.5px' }}>What you can do</h2>
+          <div style={{ flex: 1, height: '1px', background: 'linear-gradient(to right, #e2e8f0, transparent)' }} />
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+          {[
+            {
+              icon: <BrainCircuit size={28} />,
+              color: '#6366f1', bg: '#eef2ff',
+              title: 'AI Autonomous Planning',
+              desc: 'Tell the AI your goal — it generates a complete plan, schedule, and tasks automatically.',
+              action: () => onNavigate('ai'),
+              cta: 'Try AI Now',
+            },
+            {
+              icon: <Target size={28} />,
+              color: '#8b5cf6', bg: '#f5f3ff',
+              title: 'Goal & Milestone Tracker',
+              desc: 'Set your life goals, break them into milestones, and track progress visually.',
+              action: () => onNavigate('goals'),
+              cta: 'View Goals',
+            },
+            {
+              icon: <TrendingUp size={28} />,
+              color: '#10b981', bg: '#ecfdf5',
+              title: 'Analytics & Insights',
+              desc: 'Understand your productivity patterns with real-time charts and smart metrics.',
+              action: () => onNavigate('analytics'),
+              cta: 'View Analytics',
+            },
+          ].map((feat, i) => (
+            <div key={i} style={{ background: '#fff', border: '1px solid #f1f5f9', borderRadius: '20px', padding: '28px', boxShadow: '0 2px 8px rgba(30,41,59,0.04)', transition: 'transform 0.2s, box-shadow 0.2s', cursor: 'pointer' }} onClick={feat.action} className="hover-lift">
+              <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: feat.bg, color: feat.color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px', boxShadow: `0 4px 14px ${feat.color}25` }}>
+                {feat.icon}
               </div>
-            )
-          }) : (
-             <div style={{ height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: '14px' }}>No timeline tasks today.</div>
-          )}
+              <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#1e293b', marginBottom: '8px' }}>{feat.title}</h3>
+              <p style={{ fontSize: '13px', color: '#64748b', lineHeight: 1.7, marginBottom: '20px' }}>{feat.desc}</p>
+              <button style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 700, color: feat.color, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                {feat.cta} <ArrowRight size={14} />
+              </button>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* --- Row 2: Task Completion Summary Cards (Matching Reference Exact Layout) --- */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px', marginBottom: '-16px' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: 700 }}>Task Completion</h3>
-        <span style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 500 }}>Overall Status</span>
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
-        <div style={{ background: 'var(--bg-card)', borderRadius: '16px', padding: '20px', display: 'flex', alignItems: 'center', gap: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
-          <div style={{ width: '44px', height: '44px', background: 'var(--bg-blue-light)', color: 'var(--accent-indigo)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <LayoutDashboard size={20} strokeWidth={2.5} />
-          </div>
-          <div>
-            <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)' }}>{incompleteTasks} Tasks</div>
-            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 500 }}>Incomplete</div>
-          </div>
-        </div>
+      {/* ===== ROW: Timeline + Project Status ===== */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '24px' }}>
 
-        <div style={{ background: 'var(--bg-card)', borderRadius: '16px', padding: '20px', display: 'flex', alignItems: 'center', gap: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
-          <div style={{ width: '44px', height: '44px', background: 'var(--bg-orange-light)', color: 'var(--accent-orange)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Clock size={20} strokeWidth={2.5} />
+        {/* Timeline Gantt */}
+        <div style={{ background: '#fff', borderRadius: '20px', border: '1px solid #f1f5f9', padding: '24px', boxShadow: '0 2px 8px rgba(30,41,59,0.04)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#1e293b' }}>Task Timeline</h3>
+            <span style={{ fontSize: '12px', color: '#64748b', background: '#f8fafc', border: '1px solid #f1f5f9', padding: '4px 12px', borderRadius: '20px', fontWeight: 600 }}>Today</span>
           </div>
-          <div>
-            <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)' }}>{inProgressTasks} Tasks</div>
-            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 500 }}>In Progress</div>
-          </div>
-        </div>
-
-        <div style={{ background: 'var(--bg-card)', borderRadius: '16px', padding: '20px', display: 'flex', alignItems: 'center', gap: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
-          <div style={{ width: '44px', height: '44px', background: 'var(--bg-green-light)', color: 'var(--accent-green)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <CheckCircle2 size={20} strokeWidth={2.5} />
-          </div>
-          <div>
-            <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)' }}>{completedTasks} Tasks</div>
-            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 500 }}>Completed</div>
-          </div>
-        </div>
-
-        <div style={{ background: 'var(--bg-card)', borderRadius: '16px', padding: '20px', display: 'flex', alignItems: 'center', gap: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
-          <div style={{ width: '44px', height: '44px', background: 'var(--bg-red-light)', color: 'var(--accent-red)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <AlertCircle size={20} strokeWidth={2.5} />
-          </div>
-          <div>
-            <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)' }}>{urgentTasks} Tasks</div>
-            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 500 }}>Urgent Items</div>
-          </div>
-        </div>
-      </div>
-
-      {/* --- Row 3: Performance & Project Status --- */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1fr) 1.5fr', gap: '24px', marginTop: '8px' }}>
-        
-        {/* Planner Performance (Circular Charts) */}
-        <div style={{ background: 'var(--bg-primary)', borderRadius: '20px', border: '1px solid var(--border-color)', padding: '24px', boxShadow: 'var(--shadow-sm)' }}>
-          <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '24px' }}>Planner Engagement</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {projectStats.slice(0, 3).map((stat) => (
-              <div key={stat.key} style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <div style={{ width: '60px', height: '60px', position: 'relative' }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={[{ value: stat.total }]}
-                        cx="50%" cy="50%"
-                        innerRadius={22} outerRadius={28}
-                        startAngle={90} endAngle={-270}
-                        dataKey="value" stroke="none" fill={stat.bg}
-                      />
-                      <Pie
-                        data={[{ value: stat.total }]}
-                        cx="50%" cy="50%"
-                        innerRadius={22} outerRadius={28}
-                        startAngle={90} endAngle={90 - (360 * (stat.progress / 100))}
-                        dataKey="value" stroke="none" fill={stat.color} cornerRadius={10}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 700, color: 'var(--text-primary)' }}>
-                    {stat.progress}%
-                  </div>
-                </div>
-                <div>
-                  <div style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>{stat.label}</div>
-                  <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{stat.total} Total Tasks</div>
-                </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '10px', marginBottom: '16px' }}>
+            {Array.from({ length: totalHours + 1 }).map((_, i) => (
+              <div key={i} style={{ fontSize: '11px', color: '#94a3b8', width: '36px', textAlign: 'center' }}>
+                {`${(timelineStartHour + i).toString().padStart(2, '0')}h`}
               </div>
             ))}
-            {projectStats.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '14px', textAlign: 'center', paddingTop: '20px' }}>Not enough data. Add tasks!</div>}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {activeTimelineTasks.length > 0 ? activeTimelineTasks.map((task, index) => {
+              const startHourOffset = (index * 1.5) % (totalHours - 2);
+              const durationHours = 2 + (index % 2);
+              const leftPercent = (startHourOffset / totalHours) * 100;
+              const widthPercent = (durationHours / totalHours) * 100;
+              const meta = plannerMeta[task.planner] || plannerMeta.daily;
+              return (
+                <div key={task.id} className="hover-lift" onClick={() => onEditTask && onEditTask(task)}
+                  style={{ height: '40px', background: meta.bg, borderRadius: '20px', width: `${widthPercent}%`, marginLeft: `${leftPercent}%`, display: 'flex', alignItems: 'center', padding: '0 14px', cursor: 'pointer', transition: 'transform 0.2s', border: `1px solid ${meta.lightBg}` }}>
+                  <div style={{ background: meta.color, width: '8px', height: '8px', borderRadius: '50%', marginRight: '8px', flexShrink: 0 }} />
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: meta.color, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{task.title}</span>
+                </div>
+              );
+            }) : (
+              <div style={{ height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '14px', flexDirection: 'column', gap: '8px' }}>
+                <Clock size={28} color="#e2e8f0" />
+                <span>No active tasks on the timeline</span>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Project Status (Progress Bars) */}
-        <div style={{ background: 'var(--bg-primary)', borderRadius: '20px', border: '1px solid var(--border-color)', padding: '24px', boxShadow: 'var(--shadow-sm)' }}>
-           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 700 }}>Project Status</h3>
-            <button style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}><MoreHorizontal size={20} /></button>
+        {/* Project Status */}
+        <div style={{ background: '#fff', borderRadius: '20px', border: '1px solid #f1f5f9', padding: '24px', boxShadow: '0 2px 8px rgba(30,41,59,0.04)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#1e293b' }}>Project Status</h3>
+            <button style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}><MoreHorizontal size={18} /></button>
           </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            {projectStats.map(stat => (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {projectStats.length > 0 ? projectStats.map(stat => (
               <div key={stat.key}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>
-                    {stat.label}
-                  </span>
-                  <span style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 600 }}>{stat.progress}%</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: stat.color }} />
+                    <span style={{ fontSize: '14px', fontWeight: 600, color: '#1e293b' }}>{stat.label}</span>
+                  </div>
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: stat.color }}>{stat.progress}%</span>
                 </div>
-                <div style={{ height: '8px', background: stat.bg, borderRadius: '4px', overflow: 'hidden' }}>
-                  <div style={{ height: '100%', background: stat.color, width: `${stat.progress}%`, borderRadius: '4px', transition: 'width 0.5s ease-out' }}></div>
+                <div style={{ height: '8px', background: stat.bg, borderRadius: '8px', overflow: 'hidden' }}>
+                  <div style={{ height: '100%', background: `linear-gradient(90deg, ${stat.color}, ${stat.lightBg})`, width: `${stat.progress}%`, borderRadius: '8px', transition: 'width 0.5s ease-out', backgroundImage: `linear-gradient(90deg, ${stat.color}cc, ${stat.color})` }} />
                 </div>
               </div>
-            ))}
-             {projectStats.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '14px', textAlign: 'center', paddingTop: '40px' }}>Create tasks inside planners to see progress here.</div>}
+            )) : (
+              <div style={{ textAlign: 'center', padding: '40px 20px', color: '#94a3b8', fontSize: '14px' }}>
+                <Target size={36} color="#e2e8f0" style={{ marginBottom: '10px', display: 'block', margin: '0 auto 10px' }} />
+                Add tasks to planners to see progress here.
+              </div>
+            )}
           </div>
         </div>
+      </div>
 
+      {/* ===== PLANNER QUICK ACCESS ROW ===== */}
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+          <h2 style={{ fontSize: '22px', fontWeight: 700, color: '#1e293b', letterSpacing: '-0.5px' }}>Your Planners</h2>
+          <div style={{ flex: 1, height: '1px', background: 'linear-gradient(to right, #e2e8f0, transparent)' }} />
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '14px' }}>
+          {[
+            { id: 'school', label: 'School', icon: '📚', color: '#6366f1', bg: '#eef2ff', desc: 'Classes & Assignments' },
+            { id: 'ug',     label: 'UG',     icon: '🎓', color: '#8b5cf6', bg: '#f5f3ff', desc: 'Research & Projects' },
+            { id: 'exam',   label: 'Exams',  icon: '✏️', color: '#ef4444', bg: '#fef2f2', desc: 'Prep & Mock Tests' },
+            { id: 'daily',  label: 'Daily',  icon: '📋', color: '#f59e0b', bg: '#fffbeb', desc: 'Tasks & Habits' },
+            { id: 'office', label: 'Office', icon: '💼', color: '#10b981', bg: '#ecfdf5', desc: 'Work & Meetings' },
+          ].map(p => {
+            const count = tasks.filter(t => t.planner === p.id && t.status !== 'done').length;
+            return (
+              <div key={p.id} onClick={() => onNavigate(p.id)} className="hover-lift"
+                style={{ background: '#fff', border: '1px solid #f1f5f9', borderRadius: '16px', padding: '20px 16px', cursor: 'pointer', transition: 'all 0.2s', textAlign: 'center', boxShadow: '0 2px 8px rgba(30,41,59,0.04)' }}>
+                <div style={{ fontSize: '28px', marginBottom: '10px' }}>{p.icon}</div>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#1e293b', marginBottom: '4px' }}>{p.label}</div>
+                <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '12px' }}>{p.desc}</div>
+                {count > 0 && (
+                  <div style={{ display: 'inline-block', background: p.bg, color: p.color, fontSize: '11px', fontWeight: 700, padding: '2px 10px', borderRadius: '20px' }}>{count} tasks</div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
     </div>

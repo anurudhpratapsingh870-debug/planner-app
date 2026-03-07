@@ -22,24 +22,26 @@ export default function Sidebar({ activeView, onNavigate, taskCounts }) {
     document.documentElement.setAttribute('data-theme', newTheme);
   };
 
-  const NavItem = ({ id, icon, label, count }) => (
+  const NavItem = ({ id, icon, label, count, highlight }) => (
     <button 
       onClick={() => onNavigate(id)}
       className={`sidebar-nav-item ${activeView === id ? 'active' : ''}`}
       style={{
         display: 'flex', alignItems: 'center', gap: '12px', width: '100%',
         padding: '10px 12px', borderRadius: '10px', transition: 'all 0.2s',
-        border: 'none', background: activeView === id ? 'rgba(255, 107, 95, 0.1)' : 'transparent',
+        border: 'none', background: highlight
+          ? 'linear-gradient(135deg, #4f46e5, #6366f1)'
+          : activeView === id ? 'rgba(79, 70, 229, 0.1)' : 'transparent',
         cursor: 'pointer', textAlign: 'left', position: 'relative'
       }}
     >
-      <div style={{ color: activeView === id ? 'var(--primary)' : 'var(--text-muted)' }}>{icon}</div>
-      <span style={{ fontSize: '14px', fontWeight: activeView === id ? 600 : 500, color: activeView === id ? 'var(--text-primary)' : 'var(--text-secondary)', flex: 1 }}>{label}</span>
+      <div style={{ color: highlight ? '#fff' : activeView === id ? '#4f46e5' : 'var(--text-muted)' }}>{icon}</div>
+      <span style={{ fontSize: '14px', fontWeight: highlight ? 700 : activeView === id ? 600 : 500, color: highlight ? '#fff' : activeView === id ? 'var(--text-primary)' : 'var(--text-secondary)', flex: 1 }}>{label}</span>
       {count > 0 && (
         <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 6px', borderRadius: '6px', background: 'var(--bg-glass)', color: 'var(--text-muted)' }}>{count}</span>
       )}
-      {activeView === id && (
-        <div style={{ position: 'absolute', left: '-12px', top: '15%', bottom: '15%', width: '4px', background: 'var(--primary)', borderRadius: '0 4px 4px 0' }}></div>
+      {activeView === id && !highlight && (
+        <div style={{ position: 'absolute', left: '-12px', top: '15%', bottom: '15%', width: '4px', background: '#4f46e5', borderRadius: '0 4px 4px 0' }}></div>
       )}
     </button>
   );
@@ -77,7 +79,7 @@ export default function Sidebar({ activeView, onNavigate, taskCounts }) {
         <NavItem id="habits" label="Habits" icon={<Flame size={18} />} />
         <NavItem id="ai" label="AI Planner" icon={<BrainCircuit size={18} />} />
         <NavItem id="analytics" label="Analytics" icon={<BarChart3 size={18} />} />
-        <NavItem id="pricing" label="Upgrade" icon={<Crown size={18} />} />
+        <NavItem id="pricing" label="Upgrade" icon={<Crown size={18} />} highlight />
       </div>
 
       <div style={{ marginTop: 'auto', borderTop: '1px solid var(--border-color)', paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>

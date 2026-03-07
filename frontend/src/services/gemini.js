@@ -11,28 +11,38 @@ IMPORTANT RULES:
 6. Today's date is ${new Date().toISOString().split('T')[0]}.
 7. When generating plans, create 5-15 tasks depending on the scope.`;
 
+// Ordered list of model endpoints to try — most stable first
+const MODEL_ENDPOINTS = [
+  // v1 stable endpoints (no API version issues)
+  { url: (key) => `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${key}`, useSystemInstruction: true },
+  { url: (key) => `https://generativelanguage.googleapis.com/v1/models/gemini-1.0-pro:generateContent?key=${key}`, useSystemInstruction: false },
+  // v1beta fallbacks
+  { url: (key) => `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${key}`, useSystemInstruction: true },
+  { url: (key) => `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${key}`, useSystemInstruction: true },
+];
+
 export async function sendToGemini(userMessage, conversationHistory = []) {
   if (!GEMINI_API_KEY) {
     throw new Error('Gemini API key not configured. Add VITE_GEMINI_API_KEY to your .env file.');
   }
 
-  // Try multiple model endpoints for robustness
-  const models = [
-    'gemini-1.5-flash',
-    'gemini-1.5-pro'
-  ];
-
   let lastError = null;
 
-  for (const model of models) {
+  for (const endpoint of MODEL_ENDPOINTS) {
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+      const url = endpoint.url(GEMINI_API_KEY);
 
-      // Build contents array
+      // Build conversation contents
       const contents = [];
-      
-      // Add previous conversation
-      const recentHistory = conversationHistory.slice(-6);
+
+      if (!endpoint.useSystemInstruction) {
+        // Older models: inject system prompt as first exchange
+        contents.push({ role: 'user', parts: [{ text: SYSTEM_PROMPT }] });
+        contents.push({ role: 'model', parts: [{ text: 'Understood. I am Antigravity AI, your Life Planner assistant.' }] });
+      }
+
+      // Add recent conversation history
+      const recentHistory = conversationHistory.slice(-4);
       for (const msg of recentHistory) {
         contents.push({
           role: msg.role === 'user' ? 'user' : 'model',
@@ -40,54 +50,61 @@ export async function sendToGemini(userMessage, conversationHistory = []) {
         });
       }
 
-      // Add current user message
+      // Current message
       contents.push({ role: 'user', parts: [{ text: userMessage }] });
+
+      const requestBody = {
+        contents,
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 2048,
+          topP: 0.95,
+        }
+      };
+
+      // Add system_instruction only for models that support it
+      if (endpoint.useSystemInstruction) {
+        requestBody.system_instruction = {
+          role: 'user',
+          parts: [{ text: SYSTEM_PROMPT }]
+        };
+      }
 
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system_instruction: {
-            parts: [{ text: SYSTEM_PROMPT }]
-          },
-          contents,
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 2048,
-            topP: 0.95,
-            topK: 64
-          }
-        })
+        body: JSON.stringify(requestBody)
       });
 
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
-        lastError = errData.error?.message || `API error ${response.status}`;
-        console.warn(`Model ${model} failed: ${lastError}`);
-        continue;
+        lastError = errData.error?.message || `HTTP ${response.status}`;
+        console.warn(`Endpoint failed [${url}]: ${lastError}`);
+        continue; // Try next
       }
 
       const data = await response.json();
-      
+
       if (data.candidates?.[0]?.finishReason === 'SAFETY') {
-        return 'I cannot generate content for that request due to safety restrictions. Please try rephrasing your goal.';
+        return 'I cannot process that request due to content safety filters. Please rephrase your goal.';
       }
 
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!text) {
-        lastError = 'Empty response from model';
+        lastError = 'Empty AI response';
         continue;
       }
 
       return text;
+
     } catch (err) {
       lastError = err.message;
-      console.warn(`Model ${model} exception: ${err.message}`);
+      console.warn(`Endpoint exception: ${err.message}`);
       continue;
     }
   }
 
-  throw new Error(`Could not reach AI service. Last error: ${lastError}`);
+  throw new Error(`AI service unavailable. Please verify your Gemini API key is valid and has the Generative Language API enabled in Google Cloud Console. Last error: ${lastError}`);
 }
 
 /**
@@ -95,25 +112,22 @@ export async function sendToGemini(userMessage, conversationHistory = []) {
  * Returns { text: string, tasks: array|null }
  */
 export function parseGeminiResponse(responseText) {
-  // Try to find JSON wrapped in code fences
   const jsonMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-  
+
   if (jsonMatch) {
     try {
       let parsed = JSON.parse(jsonMatch[1]);
-      // Handle if the JSON is wrapped in an object like { tasks: [...] }
       if (parsed && !Array.isArray(parsed) && parsed.tasks) {
         parsed = parsed.tasks;
       }
       const tasks = Array.isArray(parsed) ? parsed : [parsed];
-      
-      // Validate task structure
       const validTasks = tasks.filter(t => t && t.title);
+
       if (validTasks.length > 0) {
         const textPart = responseText.replace(/```(?:json)?[\s\S]*?```/, '').trim();
-        return { 
-          text: textPart || `Generated ${validTasks.length} tasks for your plan. Click "Add All Tasks" to import them into your planner.`, 
-          tasks: validTasks 
+        return {
+          text: textPart || `Generated ${validTasks.length} tasks. Click "Add All Tasks" to import them.`,
+          tasks: validTasks
         };
       }
     } catch (e) {
