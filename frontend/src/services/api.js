@@ -5,7 +5,7 @@ export async function fetchTasks(planner) {
   if (planner) {
     query = query.eq('planner_type', planner);
   }
-  const { data, error } = await query.order('created_at', { ascending: false });
+  const { data, error } = await query.order('position', { ascending: true });
   if (error) throw error;
   return data.map(t => ({...t, planner: t.planner_type}));
 }
@@ -77,4 +77,23 @@ export async function createHabit(habit) {
   if (error) throw error;
   const h = data[0];
   return {...h, completedDays: h.completed_days};
+}
+export async function updateTaskPositions(tasks) {
+  const updates = tasks.map((t, idx) => ({
+    id: t.id,
+    position: idx
+  }));
+  const { error } = await supabase.from('tasks').upsert(updates);
+  if (error) throw error;
+  return true;
+}
+
+export async function saveTimerLog(log) {
+  const { data, error } = await supabase.from('timer_logs').insert([{
+    duration: log.duration,
+    type: log.mode,
+    task_id: log.taskId
+  }]).select();
+  if (error) throw error;
+  return data[0];
 }

@@ -8,6 +8,7 @@ import {
   Calendar as CalendarIcon, MoreHorizontal, Plus, 
   CheckSquare, Flame, BarChart3, TrendingUp, Zap
 } from 'lucide-react';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
 const analyticsData = [
   { name: 'Mon', value: 3 },
@@ -19,12 +20,22 @@ const analyticsData = [
   { name: 'Sun', value: 6.5 },
 ];
 
-export default function Dashboard({ tasks = [], onNavigate, onEditTask }) {
+export default function Dashboard({ tasks = [], onNavigate, onEditTask, onReorderTasks }) {
   // Stats
   const totalTasks = tasks.length;
-  const inProgress = tasks.filter(t => t.status === 'in_progress').length;
+  const inProgress = tasks.filter(t => t.status === 'in-progress').length;
   const completed = tasks.filter(t => t.status === 'done').length;
   const upcoming = tasks.filter(t => t.status === 'pending').length;
+
+  const priorityTasks = tasks.slice(0, 5); // Just show top 5 for dashboard
+
+  const onDragEnd = (result) => {
+    if (!result.destination) return;
+    const items = Array.from(tasks);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+    onReorderTasks(items);
+  };
 
   return (
     <div className="dashboard-container" style={{ padding: '0 8px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
@@ -42,10 +53,10 @@ export default function Dashboard({ tasks = [], onNavigate, onEditTask }) {
       {/* Summary Cards Row */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
         {[
-          { label: 'Total Tasks', value: totalTasks, sub: '+3 today', subColor: '#10b981', color: '#1e293b' },
+          { label: 'Total Tasks', value: totalTasks, sub: `+${tasks.filter(t => new Date(t.created_at).toDateString() === new Date().toDateString()).length} today`, subColor: '#10b981', color: '#1e293b' },
           { label: 'In Progress', value: inProgress, sub: '', subColor: '#f59e0b', dotColor: '#f59e0b' },
-          { label: 'Completed', value: completed, sub: 'This week', dotColor: '#10b981' },
-          { label: 'Upcoming', value: upcoming, sub: 'Tomorrow', dotColor: '#3b82f6' },
+          { label: 'Completed', value: completed, sub: 'All time', dotColor: '#10b981' },
+          { label: 'Upcoming', value: upcoming, sub: 'Pending', dotColor: '#3b82f6' },
         ].map((card, i) => (
           <div key={i} style={{ background: '#fff', borderRadius: '16px', padding: '24px', border: '1px solid #f1f5f9', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
             <div style={{ fontSize: '14px', fontWeight: 600, color: '#64748b', marginBottom: '12px' }}>{card.label}</div>
@@ -65,27 +76,57 @@ export default function Dashboard({ tasks = [], onNavigate, onEditTask }) {
         <div style={{ background: '#fff', borderRadius: '20px', padding: '24px', border: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#1e293b' }}>Today's Priorities</h3>
-            <button style={{ color: '#2563eb', background: 'none', border: 'none', fontSize: '14px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
-              <Plus size={16} /> Add Task
-            </button>
+            <span style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 500 }}>Drag to reorder</span>
           </div>
           
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {[
-              { title: 'Finish UI design for dashboard', status: 'In Progress', color: '#eff6ff', textColor: '#2563eb' },
-              { title: 'Prepare notes for exam', status: 'High', color: '#fef2f2', textColor: '#ef4444' },
-              { title: 'Submit assignment', status: 'Pending', color: '#f8fafc', textColor: '#64748b' },
-            ].map((task, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '12px 0', borderBottom: i < 2 ? '1px solid #f1f5f9' : 'none' }}>
-                <div style={{ width: '20px', height: '20px', borderRadius: '6px', border: '2px solid #e2e8f0', flexShrink: 0 }}></div>
-                <span style={{ flex: 1, fontSize: '15px', fontWeight: 500, color: '#1e293b' }}>{task.title}</span>
-                <div style={{ padding: '4px 12px', borderRadius: '20px', background: task.color, color: task.textColor, fontSize: '12px', fontWeight: 700 }}>
-                  {task.status}
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="tasks-list">
+              {(provided) => (
+                <div {...provided.droppableProps} ref={provided.innerRef} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {priorityTasks.map((task, index) => (
+                    <Draggable key={task.id} draggableId={task.id} index={index}>
+                      {(provided, snapshot) => (
+                        <div 
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          onClick={() => onEditTask(task)}
+                          style={{ 
+                            ...provided.draggableProps.style,
+                            display: 'flex', alignItems: 'center', gap: '16px', 
+                            padding: '12px 16px', borderRadius: '12px',
+                            background: snapshot.isDragging ? '#f8fafc' : 'transparent',
+                            border: snapshot.isDragging ? '1px solid #e2e8f0' : '1px solid transparent',
+                            boxShadow: snapshot.isDragging ? '0 8px 24px rgba(0,0,0,0.05)' : 'none',
+                            cursor: 'pointer', transition: 'background 0.2s'
+                          }}
+                        >
+                          <div style={{ width: '20px', height: '20px', borderRadius: '6px', border: `2px solid ${task.status === 'done' ? '#10b981' : '#e2e8f0'}`, background: task.status === 'done' ? '#10b981' : 'transparent', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {task.status === 'done' && <CheckSquare size={12} color="#fff" />}
+                          </div>
+                          <span style={{ flex: 1, fontSize: '15px', fontWeight: 500, color: task.status === 'done' ? '#94a3b8' : '#1e293b', textDecoration: task.status === 'done' ? 'line-through' : 'none' }}>{task.title}</span>
+                          <div style={{ 
+                            padding: '4px 12px', borderRadius: '20px', 
+                            background: task.priority === 'high' ? '#fef2f2' : task.priority === 'medium' ? '#fffbeb' : '#f0fdf4',
+                            color: task.priority === 'high' ? '#ef4444' : task.priority === 'medium' ? '#d97706' : '#16a34a',
+                            fontSize: '11px', fontWeight: 700, textTransform: 'capitalize'
+                          }}>
+                            {task.priority}
+                          </div>
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                  {priorityTasks.length === 0 && (
+                    <div style={{ padding: '40px', textAlign: 'center', color: '#94a3b8' }}>
+                      <p style={{ fontSize: '14px' }}>No tasks found. Create one to get started!</p>
+                    </div>
+                  )}
                 </div>
-                <MoreHorizontal size={18} color="#94a3b8" />
-              </div>
-            ))}
-          </div>
+              )}
+            </Droppable>
+          </DragDropContext>
         </div>
 
         {/* Right side of middle grid: Goal Progress + Weekly Analytics */}
@@ -156,7 +197,7 @@ export default function Dashboard({ tasks = [], onNavigate, onEditTask }) {
         {[
           { label: 'Habits Streak', value: '12 days', icon: <Flame size={20} />, iconBg: '#fff7ed', iconColor: '#f97316' },
           { label: 'Focus Time', value: '24h 30m', icon: <Clock size={20} />, iconBg: '#eff6ff', iconColor: '#3b82f6' },
-          { label: 'Tasks Done', value: '32', icon: <CheckCircle2 size={20} />, iconBg: '#f0fdf4', iconColor: '#22c55e' },
+          { label: 'Tasks Done', value: completed.toString(), icon: <CheckCircle2 size={20} />, iconBg: '#f0fdf4', iconColor: '#22c55e' },
           { label: 'Productivity', value: '18%', trend: '+', iconColor: '#22c55e' },
         ].map((card, i) => (
           <div key={i} style={{ background: '#fff', borderRadius: '20px', padding: '24px', border: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column', gap: '12px' }}>

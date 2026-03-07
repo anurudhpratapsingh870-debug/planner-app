@@ -73,6 +73,7 @@ export default function Sidebar({ activeView, onNavigate, taskCounts }) {
         <NavItem id="goals" label="Goal Planner" icon={<Target size={18} />} />
         <NavItem id="tasks" label="Tasks" icon={<CheckSquare size={18} />} />
         <NavItem id="habits" label="Habits" icon={<Flame size={18} />} />
+        <NavItem id="timer" label="Focus Timer" icon={<Clock size={18} />} />
         <NavItem id="analytics" label="Analytics" icon={<BarChart3 size={18} />} />
         <NavItem id="ai" label="AI Planner" icon={<BrainCircuit size={18} />} />
       </div>

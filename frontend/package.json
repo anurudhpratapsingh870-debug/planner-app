@@ -14,8 +14,10 @@
     "vite": "^7.3.1"
   },
   "dependencies": {
+    "@hello-pangea/dnd": "^18.0.1",
     "@supabase/supabase-js": "^2.98.0",
     "date-fns": "^4.1.0",
+    "framer-motion": "^12.35.0",
     "lucide-react": "^0.577.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",

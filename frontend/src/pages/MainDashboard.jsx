@@ -15,9 +15,10 @@ import Pricing from '../components/Pricing';
 import Settings from '../components/Settings';
 import TaskModal from '../components/TaskModal';
 import RightRail from '../components/RightRail';
+import Timer from '../components/Timer';
 import { 
   fetchTasks, createTask, updateTask, deleteTask, 
-  fetchHabits, toggleHabitDay 
+  fetchHabits, toggleHabitDay, updateTaskPositions, saveTimerLog
 } from '../services/api';
 import { 
   Search, Bell, User, Plus
@@ -31,6 +32,7 @@ export default function MainDashboard() {
   const [showModal, setShowModal] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showTimer, setShowTimer] = useState(false);
 
   // Derive active view from URL
   const pathParts = location.pathname.split('/');
@@ -124,6 +126,23 @@ export default function MainDashboard() {
     }
   };
 
+  const handleReorderTasks = async (reorderedTasks) => {
+    setTasks(reorderedTasks);
+    try {
+      await updateTaskPositions(reorderedTasks);
+    } catch (err) {
+      console.error('Failed to save reorder:', err);
+    }
+  };
+
+  const handleTimerFinish = async (log) => {
+    try {
+      await saveTimerLog(log);
+    } catch (err) {
+      console.error('Failed to save timer log:', err);
+    }
+  };
+
   // View titles
   const viewTitles = {
     dashboard: 'Dashboard',
@@ -143,6 +162,10 @@ export default function MainDashboard() {
   };
 
   const handleNavigate = (view) => {
+    if (view === 'timer') {
+      setShowTimer(true);
+      return;
+    }
     navigate(`/app/${view}`);
   };
 
@@ -160,8 +183,8 @@ export default function MainDashboard() {
 
     return (
       <Routes>
-        <Route path="/" element={<Dashboard tasks={tasks} onNavigate={handleNavigate} onEditTask={handleOpenEdit} />} />
-        <Route path="dashboard" element={<Dashboard tasks={tasks} onNavigate={handleNavigate} onEditTask={handleOpenEdit} />} />
+        <Route path="/" element={<Dashboard tasks={tasks} onNavigate={handleNavigate} onEditTask={handleOpenEdit} onReorderTasks={handleReorderTasks} />} />
+        <Route path="dashboard" element={<Dashboard tasks={tasks} onNavigate={handleNavigate} onEditTask={handleOpenEdit} onReorderTasks={handleReorderTasks} />} />
         <Route path="timeline" element={<Timeline tasks={tasks} onEditTask={handleOpenEdit} />} />
         <Route path="goals" element={<GoalPlanner tasks={tasks} />} />
         <Route path="analytics" element={<Analytics tasks={tasks} />} />
@@ -250,6 +273,17 @@ export default function MainDashboard() {
           {/* Right Header Actions */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             <button 
+              onClick={() => setShowTimer(!showTimer)}
+              style={{ 
+                display: 'flex', alignItems: 'center', gap: '8px',
+                background: '#f8fafc', color: '#64748b', border: '1px solid #f1f5f9',
+                padding: '10px 16px', borderRadius: '10px', 
+                fontSize: '14px', fontWeight: 600, cursor: 'pointer'
+              }}
+            >
+              <Clock size={18} /> Timer
+            </button>
+            <button 
               onClick={() => setShowModal(true)}
               style={{ 
                 display: 'flex', alignItems: 'center', gap: '8px',
@@ -293,6 +327,12 @@ export default function MainDashboard() {
           editingTask={editingTask}
         />
       )}
+
+      <Timer 
+        isOpen={showTimer} 
+        onClose={() => setShowTimer(false)} 
+        onFinish={handleTimerFinish} 
+      />
     </div>
   );
 }
